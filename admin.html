@@ -70,13 +70,14 @@ img.pv{max-height:90px;border-radius:2px;margin-top:8px;display:block}.hint{colo
 <div id="app" class="hide">
 <header><div class="wrap"><div class="brand"><span id="hLogo"></span><span>THE <em>MINDANAO</em> TECH <small>ADMIN</small></span></div><span id="who"></span><a class="b" href="index.html" target="_blank">View site</a><button id="out">Sign out</button></div></header>
 <div class="wrap">
-<div class="tabs"><button data-t="posts" class="on">Posts</button><button data-t="cats">Categories</button><button data-t="look">Appearance</button><button data-t="themes">Themes</button><button data-t="subs">Subscribers</button><button data-t="admins">Admins</button></div>
+<div class="tabs"><button data-t="posts" class="on">Posts</button><button data-t="cats">Categories</button><button data-t="look">Appearance</button><button data-t="themes">Themes</button><button data-t="subs">Subscribers</button><button data-t="comments">Comments</button><button data-t="admins">Admins</button></div>
 
 <section id="t-posts"><div class="box">
 <div class="item" style="border:0"><div><h3>All posts</h3></div><button class="p" id="newPost">New post</button></div><div id="plist"></div></div>
 <form id="pf" class="box hide" style="margin-top:16px">
 <h3 id="pfT">New post</h3><label>Title</label><input type="text" name="title" required>
 <div class="row"><div><label>Category</label><select name="category"></select></div><div><label>Author</label><input type="text" name="author"></div></div>
+<label>Date posted <small>change it to back-date a story, e.g. one you forgot to post on time</small></label><input type="date" name="pdate">
 <label>Short description <small>shown on cards</small></label><input type="text" name="excerpt">
 <label>Cover image</label><input type="file" id="pimg" accept="image/*"><input type="hidden" name="image"><img class="pv hide" id="ppv" alt="">
 <label>More photos <small>shown right after the cover image. You can pick several at once.</small></label><input type="file" id="gimg" accept="image/*" multiple><div id="gal" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px"></div>
@@ -118,6 +119,8 @@ img.pv{max-height:90px;border-radius:2px;margin-top:8px;display:block}.hint{colo
 <button class="p">Save theme</button> <button type="button" id="tcancel">Cancel</button> <button type="button" class="d hide" id="tdel">Delete</button></form></section>
 <section id="t-subs" class="hide"><div class="box"><div class="item" style="border:0"><div><h3>Subscribers</h3></div><button id="csv">Download list</button></div><div id="slist"></div></div></section>
 
+<section id="t-comments" class="hide"><div class="box"><div class="item" style="border:0"><div><h3>Comments</h3><span>Newest first. Delete anything that breaks your community rules.</span></div><button id="cmRefresh">Refresh</button></div><div id="cmAdmin"></div></div></section>
+
 <section id="t-admins" class="hide"><div class="box"><div class="item" style="border:0"><div><h3>Admins</h3><span>People who can sign in to this control panel with a name and passkey.</span></div><button class="p" id="anew">Add admin</button></div><div id="alist"></div></div>
 <form id="af" class="box hide" style="margin-top:16px"><h3>Add an admin</h3>
 <div class="row"><div><label>Name</label><input type="text" name="aname" required autocomplete="off" placeholder="e.g. Juan Dela Cruz"></div><div><label>Passkey <small>at least 8 characters</small></label><input type="text" name="apass" required minlength="8" autocomplete="off"></div></div>
@@ -149,22 +152,25 @@ function paint(){const lg=S.logo||"logo.png";MT.apply(MT.resolve(S),lg);
 async function start(){
   try{const a=await db.from("settings").select("data").eq("id",1).maybeSingle();S={...DEFS,...(a.data?.data||{})}}catch(e){}
   paint();
-  const {data:{session}}=await db.auth.getSession();ME=session?session.user:null;
+  let {data:{session}}=await db.auth.getSession();
+  if(session){const r=await db.rpc("is_admin");if(!r.error&&r.data!==true)session=null} // a reader's Google session is not an admin (if the SQL isn't updated yet, the database still protects everything)
+  ME=session?session.user:null;
   $("#login").classList.toggle("hide",!!session);$("#app").classList.toggle("hide",!session);
   if(session){$("#who").textContent="Signed in as "+(ME.user_metadata?.display_name||(ME.email||"").split("@")[0]);load()}
 }
 $("#lf").onsubmit=async e=>{e.preventDefault();const b=$("#go"),er=$("#lerr");er.textContent="";b.disabled=true;b.textContent="Signing in...";
   const {error}=await db.auth.signInWithPassword({email:toEmail($("#un").value),password:$("#pw").value});b.disabled=false;b.textContent="Sign in";
   if(error){er.textContent=/invalid/i.test(error.message)?"That name and passkey don't match. Please try again.":error.message;return}
+  const ck=await db.rpc("is_admin");if(!ck.error&&ck.data!==true){await db.auth.signOut();er.textContent="That account is not an admin.";return}
   $("#pw").value="";start()};
 $("#eye").onclick=()=>{const p=$("#pw"),h=p.type=="password";p.type=h?"text":"password";$("#eye").textContent=h?"Hide":"Show"};
 $("#out").onclick=async()=>{await db.auth.signOut();start()};
-const TABS=["posts","cats","look","themes","subs","admins"];
+const TABS=["posts","cats","look","themes","subs","comments","admins"];
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x==b));TABS.forEach(t=>$("#t-"+t).classList.toggle("hide",t!=b.dataset.t))});
 
 async function load(){
   const f=$("#sf");for(const k in S)if(f.elements[k])f.elements[k].value=S[k];pv($("#lpv"),S.logo);
-  fillCats();loadPosts();loadSubs();drawThemes();loadAdmins();
+  fillCats();loadPosts();loadSubs();loadComments();drawThemes();loadAdmins();
 }
 async function loadPosts(){
   const {data}=await db.from("posts").select("*").order("created_at",{ascending:false});POSTS=data||[];
@@ -176,10 +182,13 @@ const PHRE=/\n*\[\[photos\]\]([\s\S]*?)\[\[\/photos\]\]\s*$/;let GAL=[];
 function drawGal(){$("#gal").innerHTML=GAL.map((u,i)=>`<div style="position:relative"><img src="${esc(u)}" alt="" style="width:110px;height:80px;object-fit:cover;border:1px solid var(--line);display:block"><button type="button" data-g="${i}" aria-label="Remove photo" style="position:absolute;top:2px;right:2px;padding:0 7px;line-height:22px;background:#000a;color:#fff">&times;</button>${i?`<button type="button" data-l="${i}" aria-label="Move earlier" style="position:absolute;bottom:2px;left:2px;padding:0 7px;line-height:22px;background:#000a;color:#fff">&larr;</button>`:""}</div>`).join("")}
 $("#gal").onclick=e=>{const d=e.target.dataset;if(d.g!=null){GAL.splice(+d.g,1);drawGal()}if(d.l!=null){const i=+d.l;[GAL[i-1],GAL[i]]=[GAL[i],GAL[i-1]];drawGal()}};
 $("#gimg").onchange=async e=>{const b=e.target.files;if(!b.length)return;say("Uploading "+b.length+" photo"+(b.length>1?"s":"")+"...");for(const f of b){const u=await upload(f);if(u)GAL.push(u)}e.target.value="";drawGal();say("Photos added")};
+const ymd=d=>{d=new Date(d);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+let ORIGD="";
 function openForm(p,cat){
   editing=p?p.id:null;const f=$("#pf");f.reset();fillCats();if(cat)f.elements.category.value=cat;$("#pfT").textContent=p?"Edit post":"New post";
   if(p)for(const k of ["title","category","author","excerpt","image","body"])f.elements[k].value=p[k]||"";
   const gm=p&&(p.body||"").match(PHRE);GAL=gm?gm[1].split("\n").map(x=>x.trim()).filter(Boolean):[];if(gm)f.elements.body.value=p.body.replace(PHRE,"");drawGal();
+  ORIGD=ymd(p?p.created_at:new Date());f.elements.pdate.value=ORIGD;
   f.elements.published.checked=p?p.published:true;f.elements.featured.checked=p?!!p.featured:false;
   pv($("#ppv"),p&&p.image);f.classList.remove("hide");f.scrollIntoView({behavior:"smooth"});
 }
@@ -221,6 +230,7 @@ $("#cBack").onclick=()=>{CUR=null;closeForm();$("#cView").classList.add("hide");
 $("#cvNew").onclick=()=>{$("#cFormHost").appendChild($("#pf"));openForm(null,CUR)};
 $("#pimg").onchange=async e=>{const u=await upload(e.target.files[0]);if(u){$("#pf").elements.image.value=u;pv($("#ppv"),u)}};
 $("#pf").onsubmit=async e=>{e.preventDefault();const f=e.target,row={title:f.title.value,category:f.category.value,author:f.author.value,excerpt:f.excerpt.value,body:f.body.value.replace(PHRE,"").trimEnd()+(GAL.length?"\n\n[[photos]]\n"+GAL.join("\n")+"\n[[/photos]]":""),image:f.image.value,published:f.published.checked,featured:f.featured.checked};
+  if(f.pdate.value&&f.pdate.value!==ORIGD){const [y,m,d]=f.pdate.value.split("-").map(Number);row.created_at=new Date(y,m-1,d,12,0,0).toISOString()}
   const r=editing?await db.from("posts").update(row).eq("id",editing):await db.from("posts").insert(row);
   if(r.error)return say(r.error.message);say("Saved");closeForm();loadPosts()};
 $("#limg").onchange=async e=>{const u=await upload(e.target.files[0]);if(u){$("#sf").elements.logo.value=u;pv($("#lpv"),u)}};
@@ -252,6 +262,14 @@ $("#tf").onsubmit=e=>{e.preventDefault();const f=e.target,E=f.elements,id=E.id.v
   else{v.id=id;v.custom=1;v.acc=v.hi;const l=S.customThemes||[],i=l.findIndex(c=>c.id==id);i<0?l.push(v):l[i]=v;S.customThemes=l}
   f.classList.add("hide");saveS()};
 $("#tdel").onclick=()=>{const id=$("#tf").elements.id.value;if(!confirm("Delete this custom theme?"))return;S.customThemes=(S.customThemes||[]).filter(c=>c.id!=id);if(S.themeForce==id)S.themeForce="";$("#tf").classList.add("hide");saveS()};
+
+async function loadComments(){
+  const {data,error}=await db.from("comments").select("id,author_name,body,created_at,posts(title)").order("created_at",{ascending:false}).limit(200);
+  if(error){$("#cmAdmin").innerHTML="<p style='color:var(--bad)'>Comments aren't set up yet. Run the latest supabase-setup.sql in Supabase (SQL Editor).</p>";return}
+  $("#cmAdmin").innerHTML=(data||[]).map(c=>`<div class="item"><div><b>${esc(c.author_name||"Reader")}</b> <span>on ${esc(c.posts?c.posts.title:"(deleted story)")} &middot; ${new Date(c.created_at).toLocaleString()}</span><br><span style="white-space:pre-wrap;overflow-wrap:anywhere;color:var(--text)">${esc(c.body)}</span></div><button class="d" data-c="${esc(c.id)}">Delete</button></div>`).join("")||"<p style='color:#a9b0be'>No comments yet.</p>"}
+$("#cmRefresh").onclick=loadComments;
+$("#cmAdmin").onclick=async e=>{const id=e.target.dataset.c;if(!id||!confirm("Delete this comment for good?"))return;
+  const r=await db.from("comments").delete().eq("id",id).select("id");if(r.error||!(r.data&&r.data.length))return say("Couldn't delete that comment.");say("Comment deleted");loadComments()};
 
 let ADMINS=[];
 async function loadAdmins(){const {data,error}=await db.rpc("admin_list");

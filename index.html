@@ -60,6 +60,25 @@ footer .brand span{color:var(--text);font-size:20px}footer h4{font:700 12px var(
 .lights{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-around}.lights i{width:9px;height:9px;border-radius:50%;background:var(--hi);animation:tw 2s infinite;box-shadow:0 0 10px var(--hi)}.lights i:nth-child(3n){background:var(--acc);animation-delay:.6s}.lights i:nth-child(3n+1){background:#3ba55c;animation-delay:1.2s}@keyframes tw{50%{opacity:.25}}
 @media(max-width:1280px){#burger{display:block}nav{display:none;position:absolute;left:0;right:0;top:100%;background:var(--main);flex-direction:column;padding:8px 20px 16px;border-bottom:3px solid var(--hi)}nav.open{display:flex}.srch{display:none}nav .srch{display:flex}header .wrap{position:relative}}@media(max-width:900px){.feat,.sub,footer .wrap{grid-template-columns:1fr}.gal{grid-template-columns:repeat(2,1fr)}.sub form{flex-direction:column}}
 @media(max-width:1280px){nav .srch input{width:100%;flex:1}}@media(min-width:1281px){nav .srch{display:none}}
+.eng{margin-top:44px}
+.like-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:22px}
+.lk{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:none;color:var(--text);padding:9px 18px;font:700 13px var(--mo);letter-spacing:.06em;border-radius:999px;transition:.2s}
+.lk:hover{border-color:var(--hi);color:var(--hi)}.lk .h{font-size:18px;line-height:1;transition:transform .25s}.lk.on{background:var(--hi);border-color:var(--hi);color:#111}.lk.on .h{transform:scale(1.15)}
+.lk-s{color:var(--mute);font-size:13px}
+.eng h2.sec{margin-top:30px}
+.cm-in,.cm-me{background:var(--slate);border:1px solid var(--line);padding:18px;margin-bottom:22px}
+.cm-in b{font:700 15px var(--mo)}.cm-in p{color:var(--mute);font-size:14.5px;margin:4px 0 14px}.cm-in small{display:block;margin-top:10px;color:var(--mute);font-size:12px}
+.gbtn{display:inline-flex;align-items:center;gap:10px;background:#fff;color:#1f1f1f;border:1px solid #dadce0;padding:10px 18px;font:600 14px var(--in);border-radius:4px}.gbtn:hover{background:#f6f8fb}
+.cm-me{display:flex;gap:12px}.cm-f{flex:1;min-width:0}
+.cm-f textarea{width:100%;min-height:84px;resize:vertical;padding:10px 12px;border:1px solid var(--line);background:var(--main);color:var(--text);font:15px/1.5 var(--in)}
+.cm-row{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}.cm-row small{color:var(--mute);margin-right:auto}
+.cm-row .pri{background:var(--hi);color:#111;border:0;padding:9px 18px;font:700 12px var(--mo);letter-spacing:.08em;text-transform:uppercase}.cm-row .pri:disabled{opacity:.5}
+.cm-row .gh,.cm-x{background:none;border:0;color:var(--mute);font:600 12px var(--mo);padding:6px}.cm-row .gh:hover,.cm-x:hover{color:var(--hi)}
+.cm-note{color:var(--hi);font-size:14px;margin:0 0 12px}.cm-err{color:#ff8a80;font-size:13px;margin-top:8px}
+.cm{display:flex;gap:12px;padding:16px 0;border-bottom:1px solid var(--line)}.cm .av{width:36px;height:36px;font-size:14px;flex:none;overflow:hidden}.av{position:relative}.av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.cm-b{flex:1;min-width:0}.cm-h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}.cm-h b{font:700 13.5px var(--mo)}.cm-h span{color:var(--mute);font-size:12.5px}
+.cm-t{font-size:15.5px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;margin-top:2px}.cm-x{margin-left:auto}
+.cm-empty{color:var(--mute);padding:10px 0}.pulse{animation:pls 1.2s 2}@keyframes pls{50%{box-shadow:0 0 0 4px var(--hi)}}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition:none!important}}
 </style></head><body>
 <div id="splash"><div class="in"><img id="sLogo" alt="The Mindanao Tech logo"><h1>THE <em>MINDANAO</em> TECH</h1><div class="rule"></div><p id="sMotto"></p><div class="bar"><i></i></div></div></div>
@@ -80,7 +99,8 @@ const $=s=>document.querySelector(s),root=document.documentElement;
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const DEF={name:"The Mindanao Tech",motto:"Informing the campus, one story at a time.",logo:"",facebook:"https://www.facebook.com/",splash:"always",perPage:6,footer:"",categories:"News,Explainers,Opinion,Life,Sorted,Multimedia"};
 const ok=CFG.SUPABASE_URL&&!CFG.SUPABASE_URL.includes("YOUR");
-const db=ok?supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_KEY):null;
+const QS=new URLSearchParams(location.search),OAUTH=QS.has("code"),OERR=QS.get("error_description")||"";
+const db=ok?supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_KEY,{auth:{flowType:"pkce",detectSessionInUrl:true,persistSession:true}}):null;
 let S={...DEF},POSTS=[],CATS=[],page=1,LOGO="logo.png";
 // Extra photos are saved at the end of the body as a [[photos]] block (no database change needed).
 const PH=/\n*\[\[photos\]\]([\s\S]*?)\[\[\/photos\]\]\s*$/,
@@ -103,7 +123,7 @@ function render(){
     html=`<article class="art"><a class="back" href="#${esc(art.category.toLowerCase())}">&larr; ${esc(art.category)}</a><br><span class="tag" style="display:block;margin-top:14px">${esc(art.category)}</span><h1>${esc(art.title)}</h1><p style="color:var(--mute);font-size:18px">${esc(art.excerpt)}</p>
     <div class="by" style="margin-top:16px"><span class="av">${esc(au.trim().charAt(0).toUpperCase())}</span><div><b>${esc(au)}</b>${meta(art).replace(/<span>By [^<]*<\/span>/,"")}</div></div>
     <div class="share"><span>SHARE</span><a target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${u}">Facebook</a><a target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=${u}&text=${t}">X</a><button id="cp">Copy link</button></div>
-    <div class="thumb"><i style="${bg(art)}"></i></div>${pics(art).length?`<div class="gal${pics(art).length==1?" one":""}">${pics(art).map(u=>`<a href="${esc(u)}" data-lb><img src="${esc(u)}" alt="" loading="lazy"></a>`).join("")}</div>`:""}<div class="body">${txt(art).split(/\n\s*\n/).map(p=>`<p>${esc(p)}</p>`).join("")}</div></article>`;document.title=art.title+" | The Mindanao Tech"}
+    <div class="thumb"><i style="${bg(art)}"></i></div>${pics(art).length?`<div class="gal${pics(art).length==1?" one":""}">${pics(art).map(u=>`<a href="${esc(u)}" data-lb><img src="${esc(u)}" alt="" loading="lazy"></a>`).join("")}</div>`:""}<div class="body">${txt(art).split(/\n\s*\n/).map(p=>`<p>${esc(p)}</p>`).join("")}</div><section class="eng" id="eng" aria-label="Likes and comments"></section></article>`;document.title=art.title+" | The Mindanao Tech"}
   else if(h.startsWith("q-")){const q=h.slice(2).toLowerCase(),l=POSTS.filter(a=>[a.title,a.excerpt,a.author,a.category,txt(a)].join(" ").toLowerCase().includes(q));
     html=`<h2 class="sec" style="margin-top:0"><span>Search: ${esc(q)} (${l.length})</span></h2>`+(l.length?`<div class="grid">${l.map(card).join("")}</div>`:"<p>No stories matched your search.</p>")}
   else if(cat){const l=byCat(cat.toLowerCase());html=`<h2 class="sec" style="margin-top:0"><span>${esc(cat)}</span></h2>`+(l.length?`<div class="grid">${l.slice(s,s+S.perPage).map(card).join("")}</div>${pager(l.length)}`:"<p>No stories here yet. Check back soon.</p>");document.title=cat+" | The Mindanao Tech"}
@@ -113,7 +133,7 @@ function render(){
     <h2 class="sec"><span>Latest stories</span></h2><div class="grid">${rest.slice(s,s+S.perPage).map(card).join("")}</div>${pager(rest.length)}`;
     if(page==1)html+=block("Opinion &amp; Editorial","opinion",3,l=>`<div class="grid">${l.map(card).join("")}</div>`)+block("Student Life &amp; Campus","life",3,l=>`<div class="grid">${l.map(card).join("")}</div>`)+block("Technology, Science &amp; Innovation","explainers",3,l=>`<div class="grid">${l.map(card).join("")}</div>`)+block("Photojournalism","multimedia",8,l=>`<div class="gal">${l.map(a=>`<a class="card" href="#p-${a.id}" title="${esc(a.title)}"><div class="thumb"><i style="${bg(a)}"></i></div></a>`).join("")}</div>`);
     html+=subscribe;document.title="The Mindanao Tech";}
-  v.style.animation="none";v.offsetHeight;v.style.animation="";v.innerHTML=html;
+  v.style.animation="none";v.offsetHeight;v.style.animation="";v.innerHTML=html;if(art&&db)engage(art);else ENG.id=null;
   v.querySelectorAll(".pager button").forEach(b=>b.onclick=()=>{page=+b.dataset.p;render();scrollTo({top:0,behavior:"smooth"})});
   const c=$("#cp");if(c)c.onclick=()=>navigator.clipboard.writeText(location.href).then(()=>c.textContent="Copied!");
   const f=$("#subForm");if(f)f.onsubmit=async e=>{e.preventDefault();const em=f.querySelector("input").value.trim();let err=!db;if(db){const r=await db.from("subscribers").insert({email:em});err=r.error&&r.error.code!=="23505"}
@@ -131,6 +151,81 @@ function applySettings(){
   $("#tk").innerHTML=POSTS.slice(0,6).map(a=>`<a href="#p-${a.id}">${esc(a.title)}</a>`).join(" &bull; ");
   document.querySelectorAll("form.srch").forEach(f=>f.onsubmit=e=>{e.preventDefault();const t=f.querySelector("input").value.trim();if(t){location.hash="q-"+encodeURIComponent(t);$("#nav").classList.remove("open")}});
 }
+
+// ---------- Likes & comments (readers sign in with a Gmail account through Google) ----------
+let USER=null,NOTE="",LAST,GO=false,ENG={id:null,comments:[],likes:0,liked:false,loading:true,err:false,busy:false};
+const isGmail=u=>/@gmail\.com$/i.test((u&&u.email)||"");
+const ago=d=>{const s=(Date.now()-new Date(d))/1e3;if(s<60)return"just now";if(s<3600)return Math.floor(s/60)+" min ago";if(s<86400)return Math.floor(s/3600)+" h ago";if(s<2592e3)return Math.floor(s/86400)+" d ago";return fmt(d)};
+const G='<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>';
+const avatar=(url,name)=>`<span class="av">${esc((name||"?").trim().charAt(0).toUpperCase())}${url?`<img src="${esc(url)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`:""}</span>`;
+const uName=u=>(u&&u.user_metadata&&(u.user_metadata.full_name||u.user_metadata.name))||((u&&u.email)||"").split("@")[0]||"Reader";
+const uPic=u=>(u&&u.user_metadata&&(u.user_metadata.avatar_url||u.user_metadata.picture))||"";
+// Only Google sign-ins count as readers, and only @gmail.com addresses are allowed. The database enforces this too.
+function setUser(s){const u=s&&s.user||null;let noted=false;
+  if(u&&u.app_metadata&&u.app_metadata.provider==="google"){
+    if(isGmail(u)){USER=u}else{USER=null;NOTE="Only Gmail accounts can comment or like. Please sign in with an @gmail.com account.";noted=true;db.auth.signOut()}
+  }else USER=null;
+  return noted}
+const AUTH=db?db.auth.getSession().then(r=>{setUser(r.data.session);LAST=USER?USER.id:null;
+  if(OAUTH||OERR){if(OERR&&!USER&&!NOTE)NOTE="Sign-in didn't finish. Please try again.";try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
+    let b="";try{b=sessionStorage.getItem("mt-back")||"";sessionStorage.removeItem("mt-back")}catch(e){}
+    if(b&&b!==location.hash){GO=true;location.hash=b}}}).catch(()=>{}):Promise.resolve();
+if(db)db.auth.onAuthStateChange((ev,s)=>setTimeout(async()=>{const noted=setUser(s),id=USER?USER.id:null;if(id===LAST&&!noted)return;LAST=id;
+  if(!ENG.id)return;const pid=ENG.id;
+  if(USER){const r=await db.from("likes").select("post_id").eq("post_id",pid).eq("user_id",USER.id);if(ENG.id!==pid)return;ENG.liked=!!(r.data&&r.data.length)}else ENG.liked=false;
+  drawBox();drawLike();drawList()},0));
+async function signIn(){NOTE="";try{sessionStorage.setItem("mt-back",location.hash)}catch(e){}
+  const b=$("#gIn");if(b)b.disabled=true;
+  const {error}=await db.auth.signInWithOAuth({provider:"google",options:{redirectTo:location.origin+location.pathname,queryParams:{prompt:"select_account"}}});
+  if(error){if(b)b.disabled=false;NOTE="Couldn't start Google sign-in. Please try again.";drawBox()}}
+function drawShell(){const e=$("#eng");if(!e)return;
+  e.innerHTML=`<div class="like-row" id="lkW"></div><h2 class="sec"><span id="cmH">Comments</span></h2><div id="cmBox"></div><div id="cmList"></div>`;
+  e.onclick=ev=>{const t=ev.target.closest("button");if(!t)return;
+    if(t.id==="gIn")signIn();else if(t.id==="lk")toggleLike();else if(t.id==="cmGo")postComment();
+    else if(t.id==="cmOut"){db.auth.signOut()}else if(t.dataset.del)delComment(t.dataset.del)};
+  e.oninput=ev=>{if(ev.target.id==="cmT"){const n=$("#cmN");if(n)n.textContent=ev.target.value.length+"/1000"}};
+  e.onkeydown=ev=>{if(ev.target.id==="cmT"&&ev.key==="Enter"&&(ev.ctrlKey||ev.metaKey)){ev.preventDefault();postComment()}}}
+function drawLike(){const w=$("#lkW");if(!w)return;
+  w.innerHTML=`<button class="lk${ENG.liked?" on":""}" id="lk" aria-pressed="${ENG.liked}"><span class="h" aria-hidden="true">${ENG.liked?"&#9829;":"&#9825;"}</span><span>${ENG.liked?"Liked":"Like"}</span><span>${ENG.likes}</span></button><span class="lk-s">${USER?"":"Sign in with Gmail to like this story."}</span>`}
+function drawBox(){const b=$("#cmBox");if(!b)return;const keep=$("#cmT")?$("#cmT").value:"";
+  const note=NOTE?`<p class="cm-note" role="alert">${esc(NOTE)}</p>`:"";
+  if(!USER){b.innerHTML=`<div class="cm-in" id="cmIn">${note}<b>Join the conversation</b><p>Sign in with your Gmail account to comment on this story or like it.</p><button class="gbtn" id="gIn">${G}Continue with Google</button><small>Only Gmail accounts (@gmail.com) can comment. We only use your name and photo from Google.</small></div>`;return}
+  b.innerHTML=`<div class="cm-me">${avatar(uPic(USER),uName(USER))}<div class="cm-f">${note}<textarea id="cmT" maxlength="1000" rows="3" placeholder="Add a comment as ${esc(uName(USER))}" aria-label="Write a comment">${esc(keep)}</textarea><div class="cm-row"><small id="cmN">${keep.length}/1000</small><button class="gh" id="cmOut">Sign out</button><button class="pri" id="cmGo">Post comment</button></div><div class="cm-err" id="cmE" role="alert"></div></div></div>`}
+function drawList(){const l=$("#cmList"),h=$("#cmH");if(!l)return;const c=ENG.comments;
+  if(h)h.textContent="Comments"+(ENG.loading||ENG.err?"":" ("+c.length+")");
+  if(ENG.loading){l.innerHTML='<p class="cm-empty">Loading comments...</p>';return}
+  if(ENG.err){l.innerHTML='<p class="cm-empty">Comments are unavailable right now. Please try again later.</p>';return}
+  l.innerHTML=c.length?c.map(x=>`<div class="cm">${avatar(x.author_avatar,x.author_name)}<div class="cm-b"><div class="cm-h"><b>${esc(x.author_name||"Reader")}</b><span>${esc(ago(x.created_at))}</span>${USER&&x.user_id===USER.id?`<button class="cm-x" data-del="${esc(x.id)}">Delete</button>`:""}</div><div class="cm-t">${esc(x.body)}</div></div></div>`).join(""):'<p class="cm-empty">No comments yet. Be the first to share your thoughts.</p>'}
+async function engage(a){ENG={id:a.id,comments:[],likes:0,liked:false,loading:true,err:false,busy:false};
+  drawShell();drawLike();drawList();await AUTH;if(ENG.id!==a.id||!$("#eng"))return;
+  drawBox();drawLike();
+  if(GO){GO=false;setTimeout(()=>{const e=$("#cmBox")||$("#eng");if(e){e.scrollIntoView({behavior:"smooth",block:"center"});e.classList.add("pulse")}},350)}
+  const [c,l,m]=await Promise.all([
+    db.from("comments").select("id,user_id,author_name,author_avatar,body,created_at").eq("post_id",a.id).order("created_at",{ascending:false}).limit(200),
+    db.rpc("post_likes",{p_post:a.id}),
+    USER?db.from("likes").select("post_id").eq("post_id",a.id).eq("user_id",USER.id):Promise.resolve({data:[]})]);
+  if(ENG.id!==a.id)return;
+  ENG.loading=false;ENG.err=!!c.error;ENG.comments=c.data||[];ENG.likes=typeof l.data==="number"?l.data:0;ENG.liked=!!(m.data&&m.data.length);
+  drawLike();drawList()}
+function showSignIn(){const b=$("#cmIn")||$("#cmBox");if(!b)return;b.scrollIntoView({behavior:"smooth",block:"center"});b.classList.remove("pulse");void b.offsetWidth;b.classList.add("pulse")}
+async function toggleLike(){
+  if(!USER){showSignIn();return}
+  if(ENG.busy)return;const id=ENG.id,was=ENG.liked;ENG.busy=true;ENG.liked=!was;ENG.likes=Math.max(0,ENG.likes+(was?-1:1));drawLike();
+  const r=was?await db.from("likes").delete().eq("post_id",id).eq("user_id",USER.id):await db.from("likes").insert({post_id:id});
+  ENG.busy=false;if(ENG.id!==id)return;
+  if(r.error&&r.error.code!=="23505"){ENG.liked=was;ENG.likes=Math.max(0,ENG.likes+(was?1:-1));drawLike()}}
+async function postComment(){
+  const t=$("#cmT"),b=$("#cmGo"),er=$("#cmE");if(!t||!USER)return;const v=t.value.trim(),id=ENG.id;er.textContent="";
+  if(!v){er.textContent="Please write something first.";return}
+  b.disabled=true;b.textContent="Posting...";
+  const r=await db.from("comments").insert({post_id:id,body:v}).select("id,user_id,author_name,author_avatar,body,created_at").single();
+  if(ENG.id!==id)return;const b2=$("#cmGo");if(b2){b2.disabled=false;b2.textContent="Post comment"}
+  if(r.error){const m=r.error.message||"";$("#cmE").textContent=/wait a few/i.test(m)?"Please wait a few seconds before commenting again.":/row-level security|policy/i.test(m)?"Only Gmail accounts can comment. Please sign out and sign in with a Gmail account.":"Your comment couldn't be posted. Please try again.";return}
+  t.value="";$("#cmN").textContent="0/1000";ENG.comments.unshift(r.data);drawList()}
+async function delComment(cid){if(!confirm("Delete your comment?"))return;
+  const r=await db.from("comments").delete().eq("id",cid).select("id");
+  if(r.error||!(r.data&&r.data.length)){const e=$("#cmE");if(e)e.textContent="Couldn't delete that comment.";return}
+  ENG.comments=ENG.comments.filter(x=>x.id!==cid);drawList()}
 $("#burger").onclick=()=>{const n=$("#nav").classList.toggle("open");$("#burger").setAttribute("aria-expanded",n)};
 addEventListener("hashchange",()=>{page=1;$("#nav").classList.remove("open");render();scrollTo({top:0,behavior:"smooth"})});
 (async()=>{
