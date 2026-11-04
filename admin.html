@@ -79,6 +79,7 @@ img.pv{max-height:90px;border-radius:2px;margin-top:8px;display:block}.hint{colo
 <div class="row"><div><label>Category</label><select name="category"></select></div><div><label>Author</label><input type="text" name="author"></div></div>
 <label>Short description <small>shown on cards</small></label><input type="text" name="excerpt">
 <label>Cover image</label><input type="file" id="pimg" accept="image/*"><input type="hidden" name="image"><img class="pv hide" id="ppv" alt="">
+<label>More photos <small>shown right after the cover image. You can pick several at once.</small></label><input type="file" id="gimg" accept="image/*" multiple><div id="gal" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px"></div>
 <label>Article text <small>leave a blank line between paragraphs</small></label><textarea name="body"></textarea>
 <div class="chk"><label><input type="checkbox" name="published" checked> Published</label><label><input type="checkbox" name="featured"> Featured on homepage</label></div>
 <button class="p">Save post</button> <button type="button" id="pcancel">Cancel</button></form></section>
@@ -171,9 +172,14 @@ async function loadPosts(){
 }
 const postRow=p=>`<div class="item"><div><b>${esc(p.title)}</b><span class="pill ${p.published?"":"dr"}">${p.published?"Published":"Draft"}</span>${p.featured?'<span class="pill">Featured</span>':""}<br><span>${esc(p.category)} &middot; ${new Date(p.created_at).toLocaleDateString()}</span></div><button data-e="${p.id}">Edit</button><button class="d" data-d="${p.id}">Delete</button></div>`;
 function drawPosts(){$("#plist").innerHTML=POSTS.map(postRow).join("")||"<p style='color:#a9b0be'>No posts yet. Click New post.</p>"}
+const PHRE=/\n*\[\[photos\]\]([\s\S]*?)\[\[\/photos\]\]\s*$/;let GAL=[];
+function drawGal(){$("#gal").innerHTML=GAL.map((u,i)=>`<div style="position:relative"><img src="${esc(u)}" alt="" style="width:110px;height:80px;object-fit:cover;border:1px solid var(--line);display:block"><button type="button" data-g="${i}" aria-label="Remove photo" style="position:absolute;top:2px;right:2px;padding:0 7px;line-height:22px;background:#000a;color:#fff">&times;</button>${i?`<button type="button" data-l="${i}" aria-label="Move earlier" style="position:absolute;bottom:2px;left:2px;padding:0 7px;line-height:22px;background:#000a;color:#fff">&larr;</button>`:""}</div>`).join("")}
+$("#gal").onclick=e=>{const d=e.target.dataset;if(d.g!=null){GAL.splice(+d.g,1);drawGal()}if(d.l!=null){const i=+d.l;[GAL[i-1],GAL[i]]=[GAL[i],GAL[i-1]];drawGal()}};
+$("#gimg").onchange=async e=>{const b=e.target.files;if(!b.length)return;say("Uploading "+b.length+" photo"+(b.length>1?"s":"")+"...");for(const f of b){const u=await upload(f);if(u)GAL.push(u)}e.target.value="";drawGal();say("Photos added")};
 function openForm(p,cat){
   editing=p?p.id:null;const f=$("#pf");f.reset();fillCats();if(cat)f.elements.category.value=cat;$("#pfT").textContent=p?"Edit post":"New post";
   if(p)for(const k of ["title","category","author","excerpt","image","body"])f.elements[k].value=p[k]||"";
+  const gm=p&&(p.body||"").match(PHRE);GAL=gm?gm[1].split("\n").map(x=>x.trim()).filter(Boolean):[];if(gm)f.elements.body.value=p.body.replace(PHRE,"");drawGal();
   f.elements.published.checked=p?p.published:true;f.elements.featured.checked=p?!!p.featured:false;
   pv($("#ppv"),p&&p.image);f.classList.remove("hide");f.scrollIntoView({behavior:"smooth"});
 }
@@ -214,7 +220,7 @@ function drawCatView(){$("#cvT").textContent=CUR;const l=inCat(CUR);$("#cvS").te
 $("#cBack").onclick=()=>{CUR=null;closeForm();$("#cView").classList.add("hide");$("#cList").classList.remove("hide")};
 $("#cvNew").onclick=()=>{$("#cFormHost").appendChild($("#pf"));openForm(null,CUR)};
 $("#pimg").onchange=async e=>{const u=await upload(e.target.files[0]);if(u){$("#pf").elements.image.value=u;pv($("#ppv"),u)}};
-$("#pf").onsubmit=async e=>{e.preventDefault();const f=e.target,row={title:f.title.value,category:f.category.value,author:f.author.value,excerpt:f.excerpt.value,body:f.body.value,image:f.image.value,published:f.published.checked,featured:f.featured.checked};
+$("#pf").onsubmit=async e=>{e.preventDefault();const f=e.target,row={title:f.title.value,category:f.category.value,author:f.author.value,excerpt:f.excerpt.value,body:f.body.value.replace(PHRE,"").trimEnd()+(GAL.length?"\n\n[[photos]]\n"+GAL.join("\n")+"\n[[/photos]]":""),image:f.image.value,published:f.published.checked,featured:f.featured.checked};
   const r=editing?await db.from("posts").update(row).eq("id",editing):await db.from("posts").insert(row);
   if(r.error)return say(r.error.message);say("Saved");closeForm();loadPosts()};
 $("#limg").onchange=async e=>{const u=await upload(e.target.files[0]);if(u){$("#sf").elements.logo.value=u;pv($("#lpv"),u)}};

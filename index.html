@@ -48,7 +48,7 @@ h2.sec{font:800 13px var(--mo);letter-spacing:.14em;text-transform:uppercase;mar
 .sub h2{font:800 26px var(--pf)}.sub p{color:var(--mute)}.sub form{display:flex;gap:8px}.sub input{flex:1;min-width:0;padding:12px 14px;border:0;font:inherit;background:var(--text);color:#111}
 .sub button{padding:12px 20px;border:0;background:var(--hi);color:#111;font:700 13px var(--mo);text-transform:uppercase;letter-spacing:.08em}#ok{grid-column:1/-1;color:var(--hi);min-height:1.4em}
 .art{max-width:720px;margin:0 auto}.art h1{font:900 clamp(30px,5vw,46px)/1.15 var(--pf);margin:12px 0 14px}.art .thumb{margin:24px 0;aspect-ratio:16/9}
-.art .body p{font:18px/1.85 var(--mw);margin-bottom:22px}.by{display:flex;align-items:center;gap:12px;margin:6px 0}.by b{font:700 14px var(--mo)}
+.gal{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:14px 0 30px}.gal.one{grid-template-columns:1fr}.gal a{display:block;aspect-ratio:4/3;overflow:hidden;background:var(--slate);cursor:zoom-in}.gal.one a{aspect-ratio:16/10}.gal img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}.gal a:hover img{transform:scale(1.04)}#lb{position:fixed;inset:0;z-index:120;background:#000e;display:grid;place-items:center;padding:20px}#lb img{max-width:96vw;max-height:90vh;object-fit:contain}#lb button{position:absolute;top:14px;right:18px;background:none;border:0;color:#fff;font-size:34px;cursor:pointer}.art .body p{font:18px/1.85 var(--mw);margin-bottom:22px}.by{display:flex;align-items:center;gap:12px;margin:6px 0}.by b{font:700 14px var(--mo)}
 .av{width:42px;height:42px;border-radius:50%;background:var(--hi);color:#111;display:grid;place-items:center;font:800 15px var(--mo)}
 .share{display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0;margin:18px 0;font:600 12px var(--mo)}
 .share a,.share button{border:1px solid var(--line);background:none;color:var(--text);padding:6px 14px;font:600 12px var(--mo);letter-spacing:.06em}.share a:hover,.share button:hover{border-color:var(--hi);color:var(--hi)}
@@ -82,7 +82,10 @@ const DEF={name:"The Mindanao Tech",motto:"Informing the campus, one story at a 
 const ok=CFG.SUPABASE_URL&&!CFG.SUPABASE_URL.includes("YOUR");
 const db=ok?supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_KEY):null;
 let S={...DEF},POSTS=[],CATS=[],page=1,LOGO="logo.png";
-const mins=a=>Math.max(1,Math.round((a.body||"").split(/\s+/).length/200));
+// Extra photos are saved at the end of the body as a [[photos]] block (no database change needed).
+const PH=/\n*\[\[photos\]\]([\s\S]*?)\[\[\/photos\]\]\s*$/,
+  txt=a=>(a.body||"").replace(PH,""),pics=a=>{const m=(a.body||"").match(PH);return m?m[1].split("\n").map(x=>x.trim()).filter(Boolean):[]};
+const mins=a=>Math.max(1,Math.round(txt(a).split(/\s+/).length/200));
 const fmt=d=>new Date(d).toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"});
 const bg=a=>a.image?`background-image:url('${esc(a.image)}')`:`background-image:linear-gradient(135deg,var(--slate),var(--main))`;
 const meta=a=>`<div class="meta"><span>By ${esc(a.author||"Staff")}</span><span>${fmt(a.created_at)}</span><span>${mins(a)} min read</span></div>`;
@@ -100,8 +103,8 @@ function render(){
     html=`<article class="art"><a class="back" href="#${esc(art.category.toLowerCase())}">&larr; ${esc(art.category)}</a><br><span class="tag" style="display:block;margin-top:14px">${esc(art.category)}</span><h1>${esc(art.title)}</h1><p style="color:var(--mute);font-size:18px">${esc(art.excerpt)}</p>
     <div class="by" style="margin-top:16px"><span class="av">${esc(au.trim().charAt(0).toUpperCase())}</span><div><b>${esc(au)}</b>${meta(art).replace(/<span>By [^<]*<\/span>/,"")}</div></div>
     <div class="share"><span>SHARE</span><a target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${u}">Facebook</a><a target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=${u}&text=${t}">X</a><button id="cp">Copy link</button></div>
-    <div class="thumb"><i style="${bg(art)}"></i></div><div class="body">${(art.body||"").split(/\n\s*\n/).map(p=>`<p>${esc(p)}</p>`).join("")}</div></article>`;document.title=art.title+" | The Mindanao Tech"}
-  else if(h.startsWith("q-")){const q=h.slice(2).toLowerCase(),l=POSTS.filter(a=>[a.title,a.excerpt,a.author,a.category,a.body].join(" ").toLowerCase().includes(q));
+    <div class="thumb"><i style="${bg(art)}"></i></div>${pics(art).length?`<div class="gal${pics(art).length==1?" one":""}">${pics(art).map(u=>`<a href="${esc(u)}" data-lb><img src="${esc(u)}" alt="" loading="lazy"></a>`).join("")}</div>`:""}<div class="body">${txt(art).split(/\n\s*\n/).map(p=>`<p>${esc(p)}</p>`).join("")}</div></article>`;document.title=art.title+" | The Mindanao Tech"}
+  else if(h.startsWith("q-")){const q=h.slice(2).toLowerCase(),l=POSTS.filter(a=>[a.title,a.excerpt,a.author,a.category,txt(a)].join(" ").toLowerCase().includes(q));
     html=`<h2 class="sec" style="margin-top:0"><span>Search: ${esc(q)} (${l.length})</span></h2>`+(l.length?`<div class="grid">${l.map(card).join("")}</div>`:"<p>No stories matched your search.</p>")}
   else if(cat){const l=byCat(cat.toLowerCase());html=`<h2 class="sec" style="margin-top:0"><span>${esc(cat)}</span></h2>`+(l.length?`<div class="grid">${l.slice(s,s+S.perPage).map(card).join("")}</div>${pager(l.length)}`:"<p>No stories here yet. Check back soon.</p>");document.title=cat+" | The Mindanao Tech"}
   else if(!POSTS.length){html=`<p>No stories published yet.${ok?"":" Add your Supabase details in config.js to load stories."}</p>`+subscribe}
@@ -138,4 +141,8 @@ addEventListener("hashchange",()=>{page=1;$("#nav").classList.remove("open");ren
   if(S.splash=="off"||seen){sp.remove();return}
   setTimeout(()=>{sp.classList.add("out");setTimeout(()=>sp.remove(),900)},3400);
 })();
+
+document.addEventListener("click",e=>{const a=e.target.closest("[data-lb]");if(!a)return;e.preventDefault();
+  const d=document.createElement("div");d.id="lb";d.innerHTML=`<button aria-label="Close">&times;</button><img src="${a.getAttribute("href")}" alt="">`;d.onclick=()=>d.remove();document.body.appendChild(d)});
+document.addEventListener("keydown",e=>{if(e.key=="Escape")document.getElementById("lb")?.remove()});
 </script></body></html>
