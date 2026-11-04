@@ -70,7 +70,7 @@ img.pv{max-height:90px;border-radius:2px;margin-top:8px;display:block}.hint{colo
 <div id="app" class="hide">
 <header><div class="wrap"><div class="brand"><span id="hLogo"></span><span>THE <em>MINDANAO</em> TECH <small>ADMIN</small></span></div><span id="who"></span><a class="b" href="index.html" target="_blank">View site</a><button id="out">Sign out</button></div></header>
 <div class="wrap">
-<div class="tabs"><button data-t="posts" class="on">Posts</button><button data-t="cats">Categories</button><button data-t="look">Appearance</button><button data-t="themes">Themes</button><button data-t="subs">Subscribers</button><button data-t="comments">Comments</button><button data-t="admins">Admins</button></div>
+<div class="tabs"><button data-t="posts" class="on">Posts</button><button data-t="cats">Categories</button><button data-t="look">Appearance</button><button data-t="themes">Themes</button><button data-t="subs">Subscribers</button><button data-t="comments">Comments</button><button data-t="team">Team</button><button data-t="admins">Admins</button></div>
 
 <section id="t-posts"><div class="box">
 <div class="item" style="border:0"><div><h3>All posts</h3></div><button class="p" id="newPost">New post</button></div><div id="plist"></div></div>
@@ -119,6 +119,14 @@ img.pv{max-height:90px;border-radius:2px;margin-top:8px;display:block}.hint{colo
 <button class="p">Save theme</button> <button type="button" id="tcancel">Cancel</button> <button type="button" class="d hide" id="tdel">Delete</button></form></section>
 <section id="t-subs" class="hide"><div class="box"><div class="item" style="border:0"><div><h3>Subscribers</h3></div><button id="csv">Download list</button></div><div id="slist"></div></div></section>
 
+<section id="t-team" class="hide">
+<div class="box"><div class="item" style="border:0"><div><h3>Team</h3><span>People shown on the website's "Our Team" page, in this order. The group called Developer is also credited in the site footer. Rename, add or remove groups however you like (Adviser, Executive Board, Board Members, Staff Writers...).</span></div><button class="p" id="gnew">Add group</button></div><div id="tgroups"></div></div>
+<form id="mf" class="box hide" style="margin-top:16px"><h3 id="mfT">Add member</h3>
+<div class="row"><div><label>Name</label><input type="text" name="mname" required maxlength="80" autocomplete="off"></div><div><label>Position <small>e.g. Editor-in-Chief</small></label><input type="text" name="mrole" maxlength="80" autocomplete="off"></div></div>
+<label>Group</label><select name="mgroup"></select>
+<label>Photo <small>a clear, front-facing photo works best. It is shrunk automatically.</small></label><input type="file" id="mimg" accept="image/*"><input type="hidden" name="mphoto"><img class="pv hide" id="mpv" alt="">
+<p style="margin-top:16px"><button class="p">Save member</button> <button type="button" id="mcancel">Cancel</button></p></form></section>
+
 <section id="t-comments" class="hide"><div class="box"><div class="item" style="border:0"><div><h3>Comments</h3><span>Newest first. Delete anything that breaks your community rules.</span></div><button id="cmRefresh">Refresh</button></div><div id="cmAdmin"></div></div></section>
 
 <section id="t-admins" class="hide"><div class="box"><div class="item" style="border:0"><div><h3>Admins</h3><span>People who can sign in to this control panel with a name and passkey.</span></div><button class="p" id="anew">Add admin</button></div><div id="alist"></div></div>
@@ -165,12 +173,12 @@ $("#lf").onsubmit=async e=>{e.preventDefault();const b=$("#go"),er=$("#lerr");er
   $("#pw").value="";start()};
 $("#eye").onclick=()=>{const p=$("#pw"),h=p.type=="password";p.type=h?"text":"password";$("#eye").textContent=h?"Hide":"Show"};
 $("#out").onclick=async()=>{await db.auth.signOut();start()};
-const TABS=["posts","cats","look","themes","subs","comments","admins"];
+const TABS=["posts","cats","look","themes","subs","comments","team","admins"];
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x==b));TABS.forEach(t=>$("#t-"+t).classList.toggle("hide",t!=b.dataset.t))});
 
 async function load(){
   const f=$("#sf");for(const k in S)if(f.elements[k])f.elements[k].value=S[k];pv($("#lpv"),S.logo);
-  fillCats();loadPosts();loadSubs();loadComments();drawThemes();loadAdmins();
+  fillCats();loadPosts();loadSubs();loadComments();drawTeam();drawThemes();loadAdmins();
 }
 async function loadPosts(){
   const {data}=await db.from("posts").select("*").order("created_at",{ascending:false});POSTS=data||[];
@@ -270,6 +278,47 @@ async function loadComments(){
 $("#cmRefresh").onclick=loadComments;
 $("#cmAdmin").onclick=async e=>{const id=e.target.dataset.c;if(!id||!confirm("Delete this comment for good?"))return;
   const r=await db.from("comments").delete().eq("id",id).select("id");if(r.error||!(r.data&&r.data.length))return say("Couldn't delete that comment.");say("Comment deleted");loadComments()};
+
+
+// ---------- Team (saved inside the site settings, no database change needed) ----------
+const DEFTEAM=[{id:"adviser",title:"Adviser",members:[]},{id:"exec",title:"Executive Board",members:[]},{id:"board",title:"Board Members",members:[]},{id:"dev",title:"Developer",members:[]}];
+const getTeam=()=>Array.isArray(S.team)?S.team:(S.team=JSON.parse(JSON.stringify(DEFTEAM)));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const swap=(a,i,j)=>{if(j<0||j>=a.length)return false;[a[i],a[j]]=[a[j],a[i]];return true};
+async function saveTeam(msg){const r=await db.from("settings").upsert({id:1,data:S});if(r.error)return say(r.error.message),false;say(msg||"Team saved");drawTeam();return true}
+// Shrink big photos before upload so the site stays fast and Supabase bandwidth lasts longer.
+async function shrink(file,max=700){try{const b=await createImageBitmap(file),r=Math.min(1,max/Math.max(b.width,b.height)),c=document.createElement("canvas");c.width=Math.round(b.width*r);c.height=Math.round(b.height*r);c.getContext("2d").drawImage(b,0,0,c.width,c.height);
+  const o=await new Promise(res=>c.toBlob(res,"image/jpeg",.86));return o?new File([o],file.name.replace(/\.\w+$/,"")+".jpg",{type:"image/jpeg"}):file}catch(e){return file}}
+function drawTeam(){const T=getTeam();
+  $("#tgroups").innerHTML=T.map((g,gi)=>`<div class="box" style="margin-top:14px;background:var(--main)"><div class="item" style="border:0;padding-top:0"><div><input type="text" class="gt" data-g="${esc(g.id)}" value="${esc(g.title)}" maxlength="50" aria-label="Group name"></div><button data-k="gup" data-g="${esc(g.id)}" ${gi?"":"disabled"} aria-label="Move group up">&uarr;</button><button data-k="gdn" data-g="${esc(g.id)}" ${gi<T.length-1?"":"disabled"} aria-label="Move group down">&darr;</button><button class="d" data-k="gdel" data-g="${esc(g.id)}">Delete group</button></div>
+  ${(g.members||[]).map((m,mi)=>`<div class="item">${m.photo?`<img src="${esc(m.photo)}" alt="" style="width:46px;height:46px;border-radius:50%;object-fit:cover;flex:none">`:`<span style="width:46px;height:46px;border-radius:50%;background:var(--slate);display:grid;place-items:center;flex:none;color:var(--hi);font-weight:700">${esc((m.name||"?").charAt(0).toUpperCase())}</span>`}<div><b>${esc(m.name)}</b><br><span>${esc(m.role||"No position set")}</span></div><button data-k="mup" data-g="${esc(g.id)}" data-m="${esc(m.id)}" ${mi?"":"disabled"} aria-label="Move up">&uarr;</button><button data-k="mdn" data-g="${esc(g.id)}" data-m="${esc(m.id)}" ${mi<g.members.length-1?"":"disabled"} aria-label="Move down">&darr;</button><button data-k="med" data-g="${esc(g.id)}" data-m="${esc(m.id)}">Edit</button><button class="d" data-k="mdel" data-g="${esc(g.id)}" data-m="${esc(m.id)}">Delete</button></div>`).join("")||"<p class='hint' style='margin:0 0 10px'>No one here yet.</p>"}
+  <button class="p" data-k="madd" data-g="${esc(g.id)}">Add member</button></div>`).join("")||"<p class='hint'>No groups yet. Click Add group.</p>";
+  const sel=$("#mf").elements.mgroup,v=sel.value;sel.innerHTML=T.map(g=>`<option value="${esc(g.id)}">${esc(g.title)}</option>`).join("");if(v)sel.value=v}
+let MEDIT=null;
+function openMember(gid,m){const f=$("#mf");f.reset();MEDIT=m?{g:gid,id:m.id}:null;$("#mfT").textContent=m?"Edit member":"Add member";drawTeam();
+  f.elements.mgroup.value=gid;f.elements.mname.value=m?m.name:"";f.elements.mrole.value=m?m.role||"":"";f.elements.mphoto.value=m?m.photo||"":"";pv($("#mpv"),m&&m.photo);
+  f.classList.remove("hide");f.scrollIntoView({behavior:"smooth"})}
+$("#gnew").onclick=()=>{const n=prompt("Group name (e.g. Staff Writers):");if(!n||!n.trim())return;getTeam().push({id:"g"+uid(),title:n.trim().slice(0,50),members:[]});saveTeam("Group added")};
+$("#tgroups").onchange=e=>{if(!e.target.classList.contains("gt"))return;const g=getTeam().find(x=>x.id==e.target.dataset.g);if(!g)return;const v=e.target.value.trim();if(!v){e.target.value=g.title;return}g.title=v.slice(0,50);saveTeam("Group renamed")};
+$("#tgroups").onclick=async e=>{const d=e.target.closest("button")?.dataset;if(!d||!d.k)return;const T=getTeam(),gi=T.findIndex(x=>x.id==d.g),g=T[gi];if(!g)return;
+  if(d.k=="gup"){if(swap(T,gi,gi-1))saveTeam("Order saved")}
+  else if(d.k=="gdn"){if(swap(T,gi,gi+1))saveTeam("Order saved")}
+  else if(d.k=="gdel"){if(!confirm(`Delete the group "${g.title}" and everyone in it?`))return;T.splice(gi,1);saveTeam("Group deleted")}
+  else if(d.k=="madd")openMember(g.id,null);
+  else{const mi=g.members.findIndex(x=>x.id==d.m);if(mi<0)return;
+    if(d.k=="med")openMember(g.id,g.members[mi]);
+    else if(d.k=="mup"){if(swap(g.members,mi,mi-1))saveTeam("Order saved")}
+    else if(d.k=="mdn"){if(swap(g.members,mi,mi+1))saveTeam("Order saved")}
+    else if(d.k=="mdel"){if(!confirm(`Remove ${g.members[mi].name}?`))return;g.members.splice(mi,1);saveTeam("Member removed")}}};
+$("#mimg").onchange=async e=>{const f=e.target.files[0];if(!f)return;say("Uploading photo...");const u=await upload(await shrink(f));if(u){$("#mf").elements.mphoto.value=u;pv($("#mpv"),u)}};
+$("#mcancel").onclick=()=>{$("#mf").classList.add("hide");MEDIT=null};
+$("#mf").onsubmit=async e=>{e.preventDefault();const E=e.target.elements,T=getTeam(),to=T.find(x=>x.id==E.mgroup.value);if(!to)return say("Please pick a group.");
+  const row={id:MEDIT?MEDIT.id:"m"+uid(),name:E.mname.value.trim(),role:E.mrole.value.trim(),photo:E.mphoto.value};if(!row.name)return;
+  if(MEDIT){const from=T.find(x=>x.id==MEDIT.g),i=from?from.members.findIndex(x=>x.id==MEDIT.id):-1;
+    if(i>=0&&from.id==to.id)from.members[i]=row; // same group: keep the same spot
+    else{if(i>=0)from.members.splice(i,1);to.members.push(row)}}
+  else to.members.push(row);
+  $("#mf").classList.add("hide");MEDIT=null;saveTeam("Member saved")};
 
 let ADMINS=[];
 async function loadAdmins(){const {data,error}=await db.rpc("admin_list");

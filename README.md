@@ -40,7 +40,8 @@ Once signed in you can:
 5. **Change the look:** go to Appearance to update the logo, name, motto, colors, menu categories and Facebook link.
 6. **Moderate comments:** go to Comments to read the latest comments on every story and delete any that break your rules.
 7. **See subscribers:** go to Subscribers to view or download the email list.
-8. **Manage admins:** go to Admins to add a new editor (name + passkey), change a passkey, or remove someone. The control panel and login page automatically use the same theme as the live website.
+8. **Edit the team:** go to Team to add groups (Adviser, Executive Board, Board Members, Developer, or your own), then add people with a name, position and photo. Use the arrows to reorder. Everyone appears on the public **Our Team** page, and the people in the **Developer** group are also credited in the site footer. Whenever a team member's full name appears in a story, it is automatically highlighted and links to their picture on the Our Team page.
+9. **Manage admins:** go to Admins to add a new editor (name + passkey), change a passkey, or remove someone. The control panel and login page automatically use the same theme as the live website.
 
 ### For developers
 This repository contains the whole site. No build step is needed.
