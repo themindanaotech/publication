@@ -17,7 +17,7 @@ function resolve(S,force){const f=force??S.themeForce;if(f==="default")return nu
 function apply(t,logo){const r=document.documentElement.style,c=t||D;
   r.setProperty("--main",c.main||D.main);r.setProperty("--slate",c.slate||D.slate);r.setProperty("--hi",c.hi||D.hi);r.setProperty("--text",c.text||D.text);r.setProperty("--acc",c.acc||c.hi||D.acc);
   r.setProperty("--bgimg",t&&t.bg?`url("${t.bg}")`:"none");
-  document.querySelectorAll("#seasonal,.mt-deco").forEach(e=>e.remove());if(!t)return;
+  document.querySelectorAll("#seasonal,.mt-deco").forEach(e=>e.remove());if(!t){matchLogo(logo);return}
   const b=document.createElement("div");b.id="seasonal";if(t.banner)b.style.backgroundImage=`linear-gradient(90deg,var(--main),transparent 60%),url("${t.banner}")`;
   b.innerHTML=`<img src="${logo}" alt="" onerror="this.remove()"><span>${(t.msg||t.name||"").replace(/</g,"&lt;")}</span>`;
   document.body.prepend(b);
@@ -28,5 +28,18 @@ function apply(t,logo){const r=document.documentElement.style,c=t||D;
   for(let i=0;i<14;i++){const s=document.createElement("span");s.textContent=d[i%d.length];
     s.style.cssText=`left:${(i*7.3+3)%98}%;font-size:${12+i%4*5}px;animation-duration:${12+i%5*3}s;animation-delay:-${i*1.7}s`;g.appendChild(s)}
   document.body.appendChild(g)}
-window.MT={PRESETS:P,DEFAULT:D,all,resolve,apply,live,today};
+// Match the page colours to the logo photo's own background (sampled from its corners), so the logo blends in instead of standing out.
+function matchLogo(src){if(!src)return;const im=new Image();im.crossOrigin="anonymous";
+  im.onload=()=>{try{const w=im.naturalWidth,h=im.naturalHeight;if(!w||!h)return;const c=document.createElement("canvas");c.width=w;c.height=h;
+    const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(im,0,0);const pts=[[2,2],[w-3,2],[2,h-3],[w-3,h-3],[w>>1,2],[w>>1,h-3],[2,h>>1],[w-3,h>>1]];
+    const px=pts.map(([a,b])=>x.getImageData(Math.max(0,a),Math.max(0,b),1,1).data).filter(d=>d[3]>200);if(px.length<4)return;
+    const m=[0,1,2].map(i=>Math.round(px.reduce((s,d)=>s+d[i],0)/px.length));
+    if(px.some(d=>Math.abs(d[0]-m[0])+Math.abs(d[1]-m[1])+Math.abs(d[2]-m[2])>60))return; // corners disagree: no solid background to match
+    const hex=a=>"#"+a.map(v=>Math.max(0,Math.min(255,v)).toString(16).padStart(2,"0")).join(""),L=(m[0]*299+m[1]*587+m[2]*114)/1000,dark=L<140,
+      slate=m.map(v=>dark?v+22:v-22),r=document.documentElement.style;
+    r.setProperty("--main",hex(m));r.setProperty("--slate",hex(slate));r.setProperty("--text",dark?"#f5f1e8":"#14110f");
+    r.setProperty("--mute",dark?"#a9b0be":"#555b66");r.setProperty("--line",dark?"#ffffff24":"#00000024");
+    document.documentElement.style.colorScheme=dark?"dark":"light"}catch(e){}};
+  im.src=src}
+window.MT={matchLogo,PRESETS:P,DEFAULT:D,all,resolve,apply,live,today};
 })();

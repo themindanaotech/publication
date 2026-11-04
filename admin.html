@@ -70,7 +70,7 @@ img.pv{max-height:90px;border-radius:2px;margin-top:8px;display:block}.hint{colo
 <div id="app" class="hide">
 <header><div class="wrap"><div class="brand"><span id="hLogo"></span><span>THE <em>MINDANAO</em> TECH <small>ADMIN</small></span></div><span id="who"></span><a class="b" href="index.html" target="_blank">View site</a><button id="out">Sign out</button></div></header>
 <div class="wrap">
-<div class="tabs"><button data-t="posts" class="on">Posts</button><button data-t="look">Appearance</button><button data-t="themes">Themes</button><button data-t="subs">Subscribers</button><button data-t="admins">Admins</button></div>
+<div class="tabs"><button data-t="posts" class="on">Posts</button><button data-t="cats">Categories</button><button data-t="look">Appearance</button><button data-t="themes">Themes</button><button data-t="subs">Subscribers</button><button data-t="admins">Admins</button></div>
 
 <section id="t-posts"><div class="box">
 <div class="item" style="border:0"><div><h3>All posts</h3></div><button class="p" id="newPost">New post</button></div><div id="plist"></div></div>
@@ -82,6 +82,13 @@ img.pv{max-height:90px;border-radius:2px;margin-top:8px;display:block}.hint{colo
 <label>Article text <small>leave a blank line between paragraphs</small></label><textarea name="body"></textarea>
 <div class="chk"><label><input type="checkbox" name="published" checked> Published</label><label><input type="checkbox" name="featured"> Featured on homepage</label></div>
 <button class="p">Save post</button> <button type="button" id="pcancel">Cancel</button></form></section>
+
+<section id="t-cats" class="hide">
+<div id="cList"><div class="box"><h3>Categories</h3><span class="hint" style="display:block;margin:4px 0 14px">Each category appears in the site menu, in this order. Open a category to see its stories and upload a new post straight into it.</span>
+<form id="cf" style="display:flex;gap:8px"><input type="text" id="cname" placeholder="New category name, e.g. Sports" required maxlength="30" autocomplete="off"><button class="p">Add category</button></form>
+<div id="clist" style="margin-top:8px"></div></div></div>
+<div id="cView" class="hide"><div class="box"><div class="item" style="border:0"><button id="cBack">&larr; All categories</button><div><h3 id="cvT"></h3><span id="cvS"></span></div><button class="p" id="cvNew">New post in this category</button></div><div id="cvPosts"></div></div><div id="cFormHost"></div></div>
+</section>
 
 <section id="t-look" class="hide"><form id="sf" class="box">
 <h3>Appearance and site settings</h3>
@@ -151,35 +158,68 @@ $("#lf").onsubmit=async e=>{e.preventDefault();const b=$("#go"),er=$("#lerr");er
   $("#pw").value="";start()};
 $("#eye").onclick=()=>{const p=$("#pw"),h=p.type=="password";p.type=h?"text":"password";$("#eye").textContent=h?"Hide":"Show"};
 $("#out").onclick=async()=>{await db.auth.signOut();start()};
-const TABS=["posts","look","themes","subs","admins"];
+const TABS=["posts","cats","look","themes","subs","admins"];
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x==b));TABS.forEach(t=>$("#t-"+t).classList.toggle("hide",t!=b.dataset.t))});
 
 async function load(){
   const f=$("#sf");for(const k in S)if(f.elements[k])f.elements[k].value=S[k];pv($("#lpv"),S.logo);
-  $("#pf").elements.category.innerHTML=S.categories.split(",").map(c=>`<option>${esc(c.trim())}</option>`).join("");
-  loadPosts();loadSubs();drawThemes();loadAdmins();
+  fillCats();loadPosts();loadSubs();drawThemes();loadAdmins();
 }
 async function loadPosts(){
   const {data}=await db.from("posts").select("*").order("created_at",{ascending:false});POSTS=data||[];
-  $("#plist").innerHTML=POSTS.map(p=>`<div class="item"><div><b>${esc(p.title)}</b><span class="pill ${p.published?"":"dr"}">${p.published?"Published":"Draft"}</span>${p.featured?'<span class="pill">Featured</span>':""}<br><span>${esc(p.category)} &middot; ${new Date(p.created_at).toLocaleDateString()}</span></div><button data-e="${p.id}">Edit</button><button class="d" data-d="${p.id}">Delete</button></div>`).join("")||"<p style='color:#a9b0be'>No posts yet. Click New post.</p>";
+  drawPosts();drawCats();
 }
-function openForm(p){
-  editing=p?p.id:null;const f=$("#pf");f.reset();$("#pfT").textContent=p?"Edit post":"New post";
+const postRow=p=>`<div class="item"><div><b>${esc(p.title)}</b><span class="pill ${p.published?"":"dr"}">${p.published?"Published":"Draft"}</span>${p.featured?'<span class="pill">Featured</span>':""}<br><span>${esc(p.category)} &middot; ${new Date(p.created_at).toLocaleDateString()}</span></div><button data-e="${p.id}">Edit</button><button class="d" data-d="${p.id}">Delete</button></div>`;
+function drawPosts(){$("#plist").innerHTML=POSTS.map(postRow).join("")||"<p style='color:#a9b0be'>No posts yet. Click New post.</p>"}
+function openForm(p,cat){
+  editing=p?p.id:null;const f=$("#pf");f.reset();fillCats();if(cat)f.elements.category.value=cat;$("#pfT").textContent=p?"Edit post":"New post";
   if(p)for(const k of ["title","category","author","excerpt","image","body"])f.elements[k].value=p[k]||"";
   f.elements.published.checked=p?p.published:true;f.elements.featured.checked=p?!!p.featured:false;
   pv($("#ppv"),p&&p.image);f.classList.remove("hide");f.scrollIntoView({behavior:"smooth"});
 }
-$("#newPost").onclick=()=>openForm(null);$("#pcancel").onclick=()=>$("#pf").classList.add("hide");
-$("#plist").onclick=async e=>{const i=e.target.dataset;
-  if(i.e)openForm(POSTS.find(p=>p.id==i.e));
+// Post form lives under Posts by default; inside a category view it moves there so uploads happen "in" that category.
+const closeForm=()=>{$("#pf").classList.add("hide");$("#t-posts").appendChild($("#pf"))};
+$("#newPost").onclick=()=>{$("#t-posts").appendChild($("#pf"));openForm(null)};$("#pcancel").onclick=closeForm;
+const rowClick=async e=>{const i=e.target.dataset,inCat=!$("#cView").classList.contains("hide")&&$("#cView").contains(e.target);
+  if(i.e){const p=POSTS.find(p=>p.id==i.e);if(inCat)$("#cFormHost").appendChild($("#pf"));else $("#t-posts").appendChild($("#pf"));openForm(p,p.category)}
   if(i.d&&confirm("Delete this post for good?")){await db.from("posts").delete().eq("id",i.d);say("Post deleted");loadPosts()}};
+$("#plist").onclick=rowClick;$("#cvPosts").onclick=rowClick;
+
+/* ---- Categories ---- */
+const getCats=()=>String(S.categories||"").split(",").map(c=>c.trim()).filter(Boolean);
+function fillCats(){const f=$("#pf").elements.category,v=f.value;f.innerHTML=getCats().map(c=>`<option>${esc(c)}</option>`).join("");if(v&&getCats().includes(v))f.value=v;
+  if($("#sf").elements.categories)$("#sf").elements.categories.value=getCats().join(",")}
+const inCat=c=>POSTS.filter(p=>(p.category||"").toLowerCase()===c.toLowerCase());
+let CUR=null;
+function drawCats(){const C=getCats();
+  $("#clist").innerHTML=C.map((c,i)=>`<div class="item"><div><b>${esc(c)}</b><br><span>${inCat(c).length} post${inCat(c).length==1?"":"s"}</span></div>
+  <button data-c="up" data-i="${i}" ${i?"":"disabled"} aria-label="Move up">&uarr;</button><button data-c="dn" data-i="${i}" ${i<C.length-1?"":"disabled"} aria-label="Move down">&darr;</button>
+  <button data-c="ren" data-i="${i}">Rename</button><button class="d" data-c="del" data-i="${i}">Delete</button><button class="p" data-c="open" data-i="${i}">Open &amp; add post</button></div>`).join("")||"<p class='hint'>No categories yet. Add one above.</p>";
+  if(CUR)drawCatView()}
+async function saveCats(C,msg){S.categories=C.join(",");const r=await db.from("settings").upsert({id:1,data:S});if(r.error)return say(r.error.message),false;say(msg||"Categories saved");fillCats();drawCats();return true}
+$("#cf").onsubmit=async e=>{e.preventDefault();const n=$("#cname").value.trim().replace(/,/g," "),C=getCats();if(!n)return;
+  if(C.some(c=>c.toLowerCase()==n.toLowerCase()))return say("That category already exists.");
+  if(await saveCats([...C,n],"Category added"))$("#cf").reset()};
+$("#clist").onclick=async e=>{const d=e.target.dataset;if(!d.c)return;const C=getCats(),i=+d.i,c=C[i];
+  if(d.c=="up"||d.c=="dn"){const j=d.c=="up"?i-1:i+1;[C[i],C[j]]=[C[j],C[i]];saveCats(C,"Menu order saved")}
+  if(d.c=="open"){CUR=c;$("#cList").classList.add("hide");$("#cView").classList.remove("hide");drawCatView()}
+  if(d.c=="ren"){const n=(prompt("Rename category:",c)||"").trim().replace(/,/g," ");if(!n||n==c)return;
+    if(C.some((x,k)=>k!=i&&x.toLowerCase()==n.toLowerCase()))return say("That name is already used.");
+    const r=await db.from("posts").update({category:n}).eq("category",c);if(r.error)return say(r.error.message);
+    C[i]=n;if(await saveCats(C,"Category renamed"))loadPosts()}
+  if(d.c=="del"){const k=inCat(c).length;if(k)return say(`Move or delete its ${k} post${k==1?"":"s"} first.`);
+    if(confirm(`Delete the "${c}" category?`))saveCats(C.filter((_,k)=>k!=i),"Category deleted")}};
+function drawCatView(){$("#cvT").textContent=CUR;const l=inCat(CUR);$("#cvS").textContent=l.length+" post"+(l.length==1?"":"s")+" in this category";
+  $("#cvPosts").innerHTML=l.map(postRow).join("")||"<p class='hint'>Nothing here yet. Click &ldquo;New post in this category&rdquo;.</p>"}
+$("#cBack").onclick=()=>{CUR=null;closeForm();$("#cView").classList.add("hide");$("#cList").classList.remove("hide")};
+$("#cvNew").onclick=()=>{$("#cFormHost").appendChild($("#pf"));openForm(null,CUR)};
 $("#pimg").onchange=async e=>{const u=await upload(e.target.files[0]);if(u){$("#pf").elements.image.value=u;pv($("#ppv"),u)}};
 $("#pf").onsubmit=async e=>{e.preventDefault();const f=e.target,row={title:f.title.value,category:f.category.value,author:f.author.value,excerpt:f.excerpt.value,body:f.body.value,image:f.image.value,published:f.published.checked,featured:f.featured.checked};
   const r=editing?await db.from("posts").update(row).eq("id",editing):await db.from("posts").insert(row);
-  if(r.error)return say(r.error.message);say("Saved");f.classList.add("hide");loadPosts()};
+  if(r.error)return say(r.error.message);say("Saved");closeForm();loadPosts()};
 $("#limg").onchange=async e=>{const u=await upload(e.target.files[0]);if(u){$("#sf").elements.logo.value=u;pv($("#lpv"),u)}};
 $("#sf").onsubmit=async e=>{e.preventDefault();const f=e.target,d={...S};for(const el of f.elements)if(el.name)d[el.name]=el.value;
-  const r=await db.from("settings").upsert({id:1,data:d});r.error?say(r.error.message):say("Settings saved. Refresh the site to see them.")};
+  const r=await db.from("settings").upsert({id:1,data:d});r.error?say(r.error.message):(say("Settings saved. Refresh the site to see them."),S=d,fillCats(),drawCats())};
 let SUBS=[];async function loadSubs(){const {data}=await db.from("subscribers").select("*").order("created_at",{ascending:false});SUBS=data||[];
   $("#slist").innerHTML=SUBS.map(s=>`<div class="item"><div>${esc(s.email)}<br><span>${new Date(s.created_at).toLocaleDateString()}</span></div></div>`).join("")||"<p style='color:#a9b0be'>No subscribers yet.</p>"}
 $("#csv").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["email,date\n"+SUBS.map(s=>s.email+","+s.created_at).join("\n")],{type:"text/csv"}));a.download="subscribers.csv";a.click()};
