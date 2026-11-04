@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex"><title>Admin | The Mindanao Tech</title><link rel="icon" href="logo.png"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@500;600;700;800&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+/* Same design tokens as index.html, so the admin always matches the live site theme (theme.js sets them). */
+:root{--main:#080e19;--slate:#172235;--hi:#f4b344;--text:#f5f1e8;--acc:#f4b344;--mute:#a9b0be;--line:#ffffff24;--bad:#ff8a8a;--bgimg:none;--pf:'Playfair Display',Georgia,serif;--mo:'Montserrat',system-ui,sans-serif;--in:'Inter',system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box;margin:0}html{scroll-behavior:smooth}
+body{font:15px/1.5 var(--in);background:var(--main) var(--bgimg) center/cover fixed;color:var(--text);transition:background-color .5s}
+:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+.wrap{max-width:980px;margin:0 auto;padding:20px}
+.box{background:var(--slate);border:1px solid var(--line);border-radius:2px;padding:22px}
+h2,h3{font-family:var(--mo);letter-spacing:.02em}
+#seasonal{display:flex;align-items:center;justify-content:center;gap:10px;padding:7px 12px;background:var(--acc) center/cover;color:#111;font:700 12px var(--mo);letter-spacing:.06em;text-transform:uppercase;text-align:center}#seasonal img{height:22px;width:auto}
+header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--main) 94%,transparent);backdrop-filter:blur(10px);border-bottom:3px solid var(--hi)}
+header .wrap{display:flex;align-items:center;gap:14px;padding:10px 20px}
+.brand{display:flex;align-items:center;gap:10px;flex:1;min-width:0}.brand>span:last-of-type{font:900 clamp(15px,4.4vw,22px)/1.1 var(--pf);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}.brand em{font-style:normal;color:var(--hi)}
+.brand small{font:700 11px var(--mo);color:var(--main);background:var(--hi);letter-spacing:.12em;padding:2px 8px;margin-left:6px;vertical-align:middle}
+.logo{height:46px;width:auto;object-fit:contain;display:block}.mono{display:grid;place-items:center;width:46px;height:46px;border:2px solid var(--hi);color:var(--hi);font:800 18px var(--pf)}
+#who{color:var(--mute);font-size:13px}
+button,.b{font:inherit;border:1px solid var(--line);background:var(--slate);color:var(--text);padding:8px 14px;border-radius:2px;cursor:pointer;transition:.2s;text-decoration:none;display:inline-block}
+button:hover,.b:hover{border-color:var(--hi)}button.p{background:var(--hi);border-color:var(--hi);color:#111;font-weight:700}button.p:hover{filter:brightness(1.08)}button.d{color:var(--bad)}button:disabled{opacity:.55;cursor:wait}
+header button,header .b{background:transparent}
+.tabs{display:flex;gap:6px;margin:18px 0;flex-wrap:wrap}.tabs button{font:600 12px var(--mo);letter-spacing:.06em;text-transform:uppercase}.tabs button.on{background:var(--hi);color:#111;border-color:var(--hi)}
+label{display:block;font-weight:600;margin:14px 0 4px}label small{font-weight:400;color:var(--mute)}
+input[type=text],input[type=email],input[type=password],input[type=number],input[type=date],input[type=search],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:2px;font:inherit;background:var(--main);color:var(--text)}
+input:focus,select:focus,textarea:focus{border-color:var(--hi);outline:0}
+input[type=color]{width:60px;height:38px;border:1px solid var(--line);border-radius:2px;padding:2px;background:var(--main)}
+textarea{min-height:260px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.chk{display:flex;gap:18px;margin:16px 0}.chk label{display:flex;gap:6px;align-items:center;margin:0;font-weight:500}
+.item{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0}.item div{flex:1;min-width:0}
+.item span{color:var(--mute);font-size:13px}.pill{background:color-mix(in srgb,#3ba55c 28%,var(--main));color:#8be3a8;padding:1px 8px;border-radius:99px;font-size:12px;margin-left:6px}.pill.dr{background:color-mix(in srgb,var(--hi) 22%,var(--main));color:var(--hi)}
+.live{background:var(--hi);color:#111;padding:1px 8px;border-radius:99px;font-size:12px;margin-left:6px}.sw{display:inline-block;width:14px;height:14px;border-radius:3px;margin-right:3px;vertical-align:middle;border:1px solid #0003}
+img.pv{max-height:90px;border-radius:2px;margin-top:8px;display:block}.hint{color:var(--mute);font-size:13px;margin-top:10px}
+#msg{position:fixed;bottom:18px;left:50%;transform:translate(-50%,80px);background:var(--hi);color:#111;font-weight:600;padding:10px 18px;border-radius:2px;transition:.3s;z-index:99}#msg.show{transform:translate(-50%,0)}
+/* Login */
+#login{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(900px 420px at 50% -10%,color-mix(in srgb,var(--hi) 26%,transparent),transparent 70%),repeating-linear-gradient(0deg,transparent 0 47px,#ffffff08 47px 48px),repeating-linear-gradient(90deg,transparent 0 47px,#ffffff08 47px 48px)}
+.lg{width:100%;max-width:400px;text-align:center;animation:rise .6s both}
+.lg .logo,.lg .mono{margin:0 auto 14px;height:84px;width:auto}.lg .mono{width:84px;font-size:32px}
+.lg h1{font:900 clamp(24px,6vw,32px)/1.1 var(--pf);letter-spacing:.06em;text-transform:uppercase}.lg h1 em{font-style:normal;color:var(--hi)}
+.lg .mt{color:var(--mute);margin:8px 0 22px;font-size:14px}
+.lbox{background:var(--slate);border:1px solid var(--line);border-top:3px solid var(--hi);padding:26px 24px 24px;text-align:left;box-shadow:0 24px 60px #0007}
+.lbox h2{font:800 13px var(--mo);letter-spacing:.14em;text-transform:uppercase;color:var(--hi);margin-bottom:4px}
+.pw{position:relative}.pw input{padding-right:70px}.pw button{position:absolute;right:4px;top:4px;bottom:4px;padding:0 10px;font-size:12px;border:0;background:transparent;color:var(--mute)}
+#lerr{color:var(--bad);font-size:14px;min-height:1.4em;margin-top:12px}
+.lbox .go{width:100%;padding:12px;margin-top:6px;font:700 13px var(--mo);letter-spacing:.1em;text-transform:uppercase}
+.lg .back{display:inline-block;margin-top:18px;color:var(--mute);font:600 12px var(--mo);letter-spacing:.08em;text-transform:uppercase;text-decoration:none}.lg .back:hover{color:var(--hi)}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+/* Seasonal decorations (same as site) */
+.mt-deco{position:fixed;inset:0;pointer-events:none;z-index:5;overflow:hidden}.mt-deco span{position:absolute;top:-30px;opacity:.35;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(110vh) rotate(200deg)}}
+.lights{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-around}.lights i{width:9px;height:9px;border-radius:50%;background:var(--hi);animation:tw 2s infinite;box-shadow:0 0 10px var(--hi)}.lights i:nth-child(3n){background:var(--acc);animation-delay:.6s}.lights i:nth-child(3n+1){background:#3ba55c;animation-delay:1.2s}@keyframes tw{50%{opacity:.25}}
+.hide{display:none!important}@media(max-width:700px){.row{grid-template-columns:1fr}#who{display:none}.item{flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition:none!important}}
+</style></head><body>
+<div id="login"><div class="lg">
+<div id="lgLogo"></div>
+<h1>THE <em>MINDANAO</em> TECH</h1>
+<p class="mt" id="lgMotto">Editors' control panel</p>
+<form id="lf" class="lbox" autocomplete="on">
+<h2>Admin sign in</h2>
+<label for="un">Name</label><input type="text" id="un" name="username" autocomplete="username" autocapitalize="off" spellcheck="false" required placeholder="Your name">
+<label for="pw">Passkey</label><div class="pw"><input type="password" id="pw" name="password" autocomplete="current-password" required placeholder="Your passkey"><button type="button" id="eye" aria-label="Show passkey">Show</button></div>
+<div id="lerr" role="alert"></div>
+<button class="p go" id="go">Sign in</button>
+</form>
+<a class="back" href="index.html">&larr; Back to website</a>
+</div></div>
+
+<div id="app" class="hide">
+<header><div class="wrap"><div class="brand"><span id="hLogo"></span><span>THE <em>MINDANAO</em> TECH <small>ADMIN</small></span></div><span id="who"></span><a class="b" href="index.html" target="_blank">View site</a><button id="out">Sign out</button></div></header>
+<div class="wrap">
+<div class="tabs"><button data-t="posts" class="on">Posts</button><button data-t="look">Appearance</button><button data-t="themes">Themes</button><button data-t="subs">Subscribers</button><button data-t="admins">Admins</button></div>
+
+<section id="t-posts"><div class="box">
+<div class="item" style="border:0"><div><h3>All posts</h3></div><button class="p" id="newPost">New post</button></div><div id="plist"></div></div>
+<form id="pf" class="box hide" style="margin-top:16px">
+<h3 id="pfT">New post</h3><label>Title</label><input type="text" name="title" required>
+<div class="row"><div><label>Category</label><select name="category"></select></div><div><label>Author</label><input type="text" name="author"></div></div>
+<label>Short description <small>shown on cards</small></label><input type="text" name="excerpt">
+<label>Cover image</label><input type="file" id="pimg" accept="image/*"><input type="hidden" name="image"><img class="pv hide" id="ppv" alt="">
+<label>Article text <small>leave a blank line between paragraphs</small></label><textarea name="body"></textarea>
+<div class="chk"><label><input type="checkbox" name="published" checked> Published</label><label><input type="checkbox" name="featured"> Featured on homepage</label></div>
+<button class="p">Save post</button> <button type="button" id="pcancel">Cancel</button></form></section>
+
+<section id="t-look" class="hide"><form id="sf" class="box">
+<h3>Appearance and site settings</h3>
+<div class="row"><div><label>Page name</label><input type="text" name="name"></div><div><label>Initials <small>used if no logo</small></label><input type="text" name="initials" maxlength="3"></div></div>
+<label>Motto</label><input type="text" name="motto">
+<label>Logo</label><input type="file" id="limg" accept="image/*"><input type="hidden" name="logo"><img class="pv hide" id="lpv" alt="">
+<label>Facebook page link</label><input type="text" name="facebook">
+<label>Categories <small>comma separated, in menu order</small></label><input type="text" name="categories">
+<div class="row"><div><label>Main color</label><input type="color" name="accent"></div><div><label>Highlight color</label><input type="color" name="highlight"></div></div>
+<div class="row"><div><label>Default theme</label><select name="theme"><option value="light">Light</option><option value="dark">Dark</option></select></div>
+<div><label>Opening animation</label><select name="splash"><option value="always">Every visit</option><option value="once">Once per session</option><option value="off">Off</option></select></div></div>
+<div class="row"><div><label>Stories per page</label><input type="number" name="perPage" min="3" max="24"></div><div><label>Footer text</label><input type="text" name="footer"></div></div>
+<p style="margin-top:20px"><button class="p">Save settings</button></p></form></section>
+
+<section id="t-themes" class="hide"><div class="box"><div class="item" style="border:0"><div><h3>Seasonal themes</h3><span>The default Navy &amp; Amber look stays unless a theme is activated or scheduled.</span></div><button id="tnew" class="p">New custom theme</button><button id="tdef">Restore default</button></div><div id="tlist"></div></div>
+<form id="tf" class="box hide" style="margin-top:16px"><h3 id="tfT">Edit theme</h3><input type="hidden" name="id">
+<label>Name</label><input type="text" name="name" required>
+<div class="row"><div><label>Main color</label><input type="color" name="main"></div><div><label>Highlight color</label><input type="color" name="hi"></div></div>
+<div class="row"><div><label>Secondary color</label><input type="color" name="slate"></div><div><label>Text color</label><input type="color" name="text"></div></div>
+<label>Banner message</label><input type="text" name="msg">
+<label>Decorations <small>emoji or symbols, comma separated</small></label><input type="text" name="deco">
+<div class="row"><div><label>Start date</label><input type="date" name="start"></div><div><label>End date</label><input type="date" name="end"></div></div>
+<label>Banner image</label><input type="file" id="tbn" accept="image/*"><input type="hidden" name="banner"><img class="pv hide" id="tbp" alt="">
+<label>Background image</label><input type="file" id="tbg" accept="image/*"><input type="hidden" name="bg"><img class="pv hide" id="tgp" alt="">
+<div class="chk"><label><input type="checkbox" name="on"> Enabled (follows its dates)</label><label><input type="checkbox" name="anim" checked> Decorative animations</label></div>
+<button class="p">Save theme</button> <button type="button" id="tcancel">Cancel</button> <button type="button" class="d hide" id="tdel">Delete</button></form></section>
+<section id="t-subs" class="hide"><div class="box"><div class="item" style="border:0"><div><h3>Subscribers</h3></div><button id="csv">Download list</button></div><div id="slist"></div></div></section>
+
+<section id="t-admins" class="hide"><div class="box"><div class="item" style="border:0"><div><h3>Admins</h3><span>People who can sign in to this control panel with a name and passkey.</span></div><button class="p" id="anew">Add admin</button></div><div id="alist"></div></div>
+<form id="af" class="box hide" style="margin-top:16px"><h3>Add an admin</h3>
+<div class="row"><div><label>Name</label><input type="text" name="aname" required autocomplete="off" placeholder="e.g. Juan Dela Cruz"></div><div><label>Passkey <small>at least 8 characters</small></label><input type="text" name="apass" required minlength="8" autocomplete="off"></div></div>
+<p class="hint">They sign in with this exact name and passkey. Send it to them privately and ask them to change it after their first sign-in.</p>
+<p style="margin-top:14px"><button class="p">Create admin</button> <button type="button" id="agen">Generate passkey</button> <button type="button" id="acancel">Cancel</button></p></form></section>
+
+</div></div><div id="msg"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script><script src="theme.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const db=supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_KEY);
+const DEFS={name:"Mindanao Tech",initials:"MT",motto:"",logo:"",facebook:"",accent:"#1d4ed8",highlight:"#f5b301",theme:"light",splash:"always",perPage:6,footer:"",categories:"News,Explainers,Opinion,Life,Sorted,Multimedia"};
+let POSTS=[],S={...DEFS},editing=null,ME=null;
+// Names are turned into a private sign-in id (no real email is used or sent). Must match admin_create() in supabase-setup.sql.
+const DOM="mindanaotech.app",slug=n=>String(n).trim().toLowerCase().replace(/[^a-z0-9]+/g,".").replace(/^\.+|\.+$/g,""),toEmail=n=>n.includes("@")?n.trim():slug(n)+"@"+DOM;
+const dt=d=>new Date(d).toLocaleDateString();
+function say(t){const m=$("#msg");m.textContent=t;m.classList.add("show");setTimeout(()=>m.classList.remove("show"),2600)}
+async function upload(file){const p=Date.now()+"-"+file.name.replace(/[^\w.-]/g,"_");const {error}=await db.storage.from("media").upload(p,file);if(error){say("Upload failed: "+error.message);return null}return db.storage.from("media").getPublicUrl(p).data.publicUrl}
+function pv(img,url){img.src=url||"";img.classList.toggle("hide",!url)}
+
+window.logoErr=i=>{const s=document.createElement("span");s.className="mono";s.textContent=String(S.initials||"MT").slice(0,3);i.replaceWith(s)};
+const logoHTML=c=>`<img class="${c}" src="${esc(S.logo||"logo.png")}" alt="The Mindanao Tech logo" onerror="logoErr(this)">`;
+// Apply the same theme the public site is showing, plus logo and motto.
+function paint(){const lg=S.logo||"logo.png";MT.apply(MT.resolve(S),lg);
+  $("#lgLogo").innerHTML=logoHTML("logo");$("#hLogo").innerHTML=logoHTML("logo");$("#lgMotto").textContent=S.motto||"Editors' control panel";document.querySelector("link[rel=icon]").href=lg}
+async function start(){
+  try{const a=await db.from("settings").select("data").eq("id",1).maybeSingle();S={...DEFS,...(a.data?.data||{})}}catch(e){}
+  paint();
+  const {data:{session}}=await db.auth.getSession();ME=session?session.user:null;
+  $("#login").classList.toggle("hide",!!session);$("#app").classList.toggle("hide",!session);
+  if(session){$("#who").textContent="Signed in as "+(ME.user_metadata?.display_name||(ME.email||"").split("@")[0]);load()}
+}
+$("#lf").onsubmit=async e=>{e.preventDefault();const b=$("#go"),er=$("#lerr");er.textContent="";b.disabled=true;b.textContent="Signing in...";
+  const {error}=await db.auth.signInWithPassword({email:toEmail($("#un").value),password:$("#pw").value});b.disabled=false;b.textContent="Sign in";
+  if(error){er.textContent=/invalid/i.test(error.message)?"That name and passkey don't match. Please try again.":error.message;return}
+  $("#pw").value="";start()};
+$("#eye").onclick=()=>{const p=$("#pw"),h=p.type=="password";p.type=h?"text":"password";$("#eye").textContent=h?"Hide":"Show"};
+$("#out").onclick=async()=>{await db.auth.signOut();start()};
+const TABS=["posts","look","themes","subs","admins"];
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x==b));TABS.forEach(t=>$("#t-"+t).classList.toggle("hide",t!=b.dataset.t))});
+
+async function load(){
+  const f=$("#sf");for(const k in S)if(f.elements[k])f.elements[k].value=S[k];pv($("#lpv"),S.logo);
+  $("#pf").elements.category.innerHTML=S.categories.split(",").map(c=>`<option>${esc(c.trim())}</option>`).join("");
+  loadPosts();loadSubs();drawThemes();loadAdmins();
+}
+async function loadPosts(){
+  const {data}=await db.from("posts").select("*").order("created_at",{ascending:false});POSTS=data||[];
+  $("#plist").innerHTML=POSTS.map(p=>`<div class="item"><div><b>${esc(p.title)}</b><span class="pill ${p.published?"":"dr"}">${p.published?"Published":"Draft"}</span>${p.featured?'<span class="pill">Featured</span>':""}<br><span>${esc(p.category)} &middot; ${new Date(p.created_at).toLocaleDateString()}</span></div><button data-e="${p.id}">Edit</button><button class="d" data-d="${p.id}">Delete</button></div>`).join("")||"<p style='color:#a9b0be'>No posts yet. Click New post.</p>";
+}
+function openForm(p){
+  editing=p?p.id:null;const f=$("#pf");f.reset();$("#pfT").textContent=p?"Edit post":"New post";
+  if(p)for(const k of ["title","category","author","excerpt","image","body"])f.elements[k].value=p[k]||"";
+  f.elements.published.checked=p?p.published:true;f.elements.featured.checked=p?!!p.featured:false;
+  pv($("#ppv"),p&&p.image);f.classList.remove("hide");f.scrollIntoView({behavior:"smooth"});
+}
+$("#newPost").onclick=()=>openForm(null);$("#pcancel").onclick=()=>$("#pf").classList.add("hide");
+$("#plist").onclick=async e=>{const i=e.target.dataset;
+  if(i.e)openForm(POSTS.find(p=>p.id==i.e));
+  if(i.d&&confirm("Delete this post for good?")){await db.from("posts").delete().eq("id",i.d);say("Post deleted");loadPosts()}};
+$("#pimg").onchange=async e=>{const u=await upload(e.target.files[0]);if(u){$("#pf").elements.image.value=u;pv($("#ppv"),u)}};
+$("#pf").onsubmit=async e=>{e.preventDefault();const f=e.target,row={title:f.title.value,category:f.category.value,author:f.author.value,excerpt:f.excerpt.value,body:f.body.value,image:f.image.value,published:f.published.checked,featured:f.featured.checked};
+  const r=editing?await db.from("posts").update(row).eq("id",editing):await db.from("posts").insert(row);
+  if(r.error)return say(r.error.message);say("Saved");f.classList.add("hide");loadPosts()};
+$("#limg").onchange=async e=>{const u=await upload(e.target.files[0]);if(u){$("#sf").elements.logo.value=u;pv($("#lpv"),u)}};
+$("#sf").onsubmit=async e=>{e.preventDefault();const f=e.target,d={...S};for(const el of f.elements)if(el.name)d[el.name]=el.value;
+  const r=await db.from("settings").upsert({id:1,data:d});r.error?say(r.error.message):say("Settings saved. Refresh the site to see them.")};
+let SUBS=[];async function loadSubs(){const {data}=await db.from("subscribers").select("*").order("created_at",{ascending:false});SUBS=data||[];
+  $("#slist").innerHTML=SUBS.map(s=>`<div class="item"><div>${esc(s.email)}<br><span>${new Date(s.created_at).toLocaleDateString()}</span></div></div>`).join("")||"<p style='color:#a9b0be'>No subscribers yet.</p>"}
+$("#csv").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["email,date\n"+SUBS.map(s=>s.email+","+s.created_at).join("\n")],{type:"text/csv"}));a.download="subscribers.csv";a.click()};
+
+
+const saveS=async()=>{const r=await db.from("settings").upsert({id:1,data:S});r.error?say(r.error.message):say("Theme settings saved");paint();drawThemes()};
+function drawThemes(){const live=MT.resolve(S),all=MT.all(S);
+  $("#tlist").innerHTML=all.map(t=>`<div class="item"><div><b>${esc(t.name)}</b>${live&&live.id==t.id?'<span class="live">LIVE</span>':""}${t.on?'<span class="pill">Enabled</span>':""}<br><span><i class="sw" style="background:${t.main}"></i><i class="sw" style="background:${t.hi}"></i><i class="sw" style="background:${t.slate}"></i> ${t.start&&t.end?t.start+" to "+t.end:(t.m||[]).length?"Months: "+t.m.join(", "):"No dates set"}</span></div>
+  <a class="b" target="_blank" href="index.html?preview=${t.id}">Preview</a><button data-a="edit" data-i="${t.id}">Edit</button>${live&&live.id==t.id&&S.themeForce==t.id?`<button data-a="off">Deactivate</button>`:`<button class="p" data-a="on" data-i="${t.id}">Activate now</button>`}</div>`).join("")}
+$("#tlist").onclick=e=>{const d=e.target.dataset;if(!d.a)return;
+  if(d.a=="on"){S.themeForce=d.i;saveS()}if(d.a=="off"){S.themeForce="";saveS()}if(d.a=="edit")openT(MT.all(S).find(t=>t.id==d.i))};
+$("#tdef").onclick=()=>{if(!confirm("Restore the original Navy & Amber theme and switch all seasonal themes off?"))return;S.themeForce="default";for(const k in S.themes||{})S.themes[k].on=false;(S.customThemes||[]).forEach(c=>c.on=false);saveS()};
+function openT(t){const f=$("#tf");f.reset();const x=t||{id:"c"+Date.now(),name:"",...MT.DEFAULT,msg:"",deco:["✦"],on:false,anim:true,custom:1};
+  for(const k of["id","name","main","hi","slate","text","msg","start","end","banner","bg"])f.elements[k].value=x[k]||(k=="start"||k=="end"||k=="banner"||k=="bg"?"":"");
+  f.elements.deco.value=(x.deco||[]).join(",");f.elements.on.checked=!!x.on;f.elements.anim.checked=x.anim!==false;
+  pv($("#tbp"),x.banner);pv($("#tgp"),x.bg);$("#tdel").classList.toggle("hide",!x.custom||!t);f.classList.remove("hide");f.scrollIntoView({behavior:"smooth"})}
+$("#tnew").onclick=()=>openT(null);$("#tcancel").onclick=()=>$("#tf").classList.add("hide");
+$("#tbn").onchange=async e=>{const u=await upload(e.target.files[0]);if(u){$("#tf").elements.banner.value=u;pv($("#tbp"),u)}};
+$("#tbg").onchange=async e=>{const u=await upload(e.target.files[0]);if(u){$("#tf").elements.bg.value=u;pv($("#tgp"),u)}};
+$("#tf").onsubmit=e=>{e.preventDefault();const f=e.target,E=f.elements,id=E.id.value,v={};
+  for(const k of["name","main","hi","slate","text","msg","start","end","banner","bg"])v[k]=f.elements[k].value;
+  v.deco=E.deco.value.split(",").map(x=>x.trim()).filter(Boolean);v.on=E.on.checked;v.anim=E.anim.checked;
+  if(MT.PRESETS.find(p=>p.id==id)){const{name,...o}=v;S.themes={...(S.themes||{}),[id]:o}}
+  else{v.id=id;v.custom=1;v.acc=v.hi;const l=S.customThemes||[],i=l.findIndex(c=>c.id==id);i<0?l.push(v):l[i]=v;S.customThemes=l}
+  f.classList.add("hide");saveS()};
+$("#tdel").onclick=()=>{const id=$("#tf").elements.id.value;if(!confirm("Delete this custom theme?"))return;S.customThemes=(S.customThemes||[]).filter(c=>c.id!=id);if(S.themeForce==id)S.themeForce="";$("#tf").classList.add("hide");saveS()};
+
+let ADMINS=[];
+async function loadAdmins(){const {data,error}=await db.rpc("admin_list");
+  if(error){$("#alist").innerHTML="<p style='color:var(--bad)'>The admin list isn't set up yet. Run the latest supabase-setup.sql in Supabase (SQL Editor).</p>";return}
+  ADMINS=data||[];
+  $("#alist").innerHTML=ADMINS.map(a=>`<div class="item"><div><b>${esc(a.name)}</b>${a.id==ME.id?'<span class="pill">You</span>':""}<br><span>Added ${dt(a.created_at)} &middot; ${a.last_sign_in_at?"last sign-in "+dt(a.last_sign_in_at):"never signed in"}</span></div><button data-k="pw" data-i="${a.id}">Change passkey</button>${a.id==ME.id?"":`<button class="d" data-k="rm" data-i="${a.id}">Remove</button>`}</div>`).join("")}
+$("#alist").onclick=async e=>{const d=e.target.dataset;if(!d.k)return;
+  if(d.k=="pw"){const p=prompt("New passkey (at least 8 characters):");if(!p)return;const r=await db.rpc("admin_set_passkey",{p_id:d.i,p_pass:p});say(r.error?r.error.message:"Passkey changed")}
+  if(d.k=="rm"){const a=ADMINS.find(x=>x.id==d.i);if(!a||!confirm(`Remove ${a.name}? They will no longer be able to sign in.`))return;const r=await db.rpc("admin_delete",{p_id:d.i});if(r.error)return say(r.error.message);say("Admin removed");loadAdmins()}};
+const aform=$("#af");
+$("#anew").onclick=()=>{aform.reset();aform.classList.remove("hide");aform.scrollIntoView({behavior:"smooth"})};
+$("#acancel").onclick=()=>aform.classList.add("hide");
+$("#agen").onclick=()=>{const c="abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789",a=crypto.getRandomValues(new Uint32Array(12));aform.elements.apass.value=[...a].map(n=>c[n%c.length]).join("")};
+aform.onsubmit=async e=>{e.preventDefault();const E=aform.elements,n=E.aname.value.trim();if(!slug(n))return say("Please use letters or numbers in the name.");
+  const r=await db.rpc("admin_create",{p_name:n,p_pass:E.apass.value});
+  if(r.error)return say(/duplicate|already/i.test(r.error.message)?"That name is already taken.":r.error.message);
+  say("Admin added. Send them the name and passkey privately.");aform.reset();aform.classList.add("hide");loadAdmins()};
+
+start();
+</script></body></html>
