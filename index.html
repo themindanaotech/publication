@@ -120,7 +120,7 @@ footer a svg{width:16px;height:16px;fill:currentColor;vertical-align:-3px;margin
 const $=s=>document.querySelector(s),root=document.documentElement;
 const esc=s=>String(s??"").replace(/(?![\u00a9\u00ae\u2122])[\p{Extended_Pictographic}\uFE0F\u200D]/gu,"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const DEF={name:"The Mindanao Tech",motto:"Informing the campus, one story at a time.",logo:"",facebook:"https://www.facebook.com/",splash:"always",perPage:6,footer:"",categories:"Breaking News,Local,National,Special Reports,Editorial,Column,Commentary,Essay,Sports,DYK,PsychTalks,Profiles,Culture,Lifestyle,Community",instagram:"https://www.instagram.com/",tiktok:"https://www.tiktok.com/"};
-const SECS=[{n:"Home"},{n:"News",s:["Breaking News","Local","National","Special Reports"]},{n:"Opinion",s:["Editorial","Column","Commentary","Essay"]},{n:"Sports"},{n:"Sciences",s:["DYK","PsychTalks"]},{n:"Features",s:["Profiles","Culture","Lifestyle","Community"]},{n:"About Us"}],
+let SECS=[{n:"Home"},{n:"News",s:["Breaking News","Local","National","Special Reports"]},{n:"Opinion",s:["Editorial","Column","Commentary","Essay"]},{n:"Sports"},{n:"Sciences",s:["DYK","PsychTalks"]},{n:"Features",s:["Profiles","Culture","Lifestyle","Community"]},{n:"About Us"}],
 ALLC=SECS.flatMap(x=>x.n=="Home"||x.n=="About Us"?[]:[x.n,...(x.s||[])]),par=c=>(SECS.find(x=>x.n==c||(x.s||[]).includes(c))||{n:c}).n,
 T=a=>String(a.title||"").replace(/^\s*breaking news\s*[|:\-\u2013\u2014]\s*/i,""),
 nm=a=>{const l=String(a||"").split(/[\p{Extended_Pictographic}\uFE0F\u200D]+\s*:?\s*/u).map(x=>x.trim()).filter(Boolean);return l.length?l:["Staff"]};
@@ -187,7 +187,7 @@ function render(){
     $("#ok").textContent=err?"Something went wrong. Please try again.":"Thanks! You're on the list.";if(!err)f.reset()};
 }
 function applySettings(){
-  LOGO=S.logo||"logo.png";CATS=ALLC;S.perPage=+S.perPage||6;
+  LOGO=S.logo||"logo.png";if(Array.isArray(S.menu)&&S.menu.length)SECS=[{n:"Home"},...S.menu.filter(x=>x&&x.n).map(x=>({n:String(x.n),...((x.s||[]).length?{s:x.s.map(String)}:{})})),{n:"About Us"}];ALLC=SECS.flatMap(x=>x.n=="Home"||x.n=="About Us"?[]:[x.n,...(x.s||[])]);CATS=ALLC;S.perPage=+S.perPage||6;
   const pv=new URLSearchParams(location.search).get("preview");MT.apply(MT.resolve(S,pv||undefined),LOGO);
   $("#ico").href=LOGO;$("#sLogo").src=LOGO;$("#sLogo").onerror=e=>e.target.remove();$("#sMotto").textContent="Vanguard of Student’s Right";
   $("#hLogo").innerHTML=$("#fLogo").innerHTML=logoImg();$("#fb").href=S.facebook;$("#ig").href=S.instagram||DEF.instagram;$("#tt").href=S.tiktok||DEF.tiktok;$("#fAbout").textContent=S.motto+" The official student publication of the University of Southern Mindanao.";
