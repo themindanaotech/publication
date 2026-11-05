@@ -32,7 +32,7 @@ You can also switch between light and dark mode, browse by page, and subscribe w
 Editors publish and manage content through a private control panel (`admin.html`). Sign in with your **name and passkey**, given to you by the publication head. Please don't share the link or your passkey.
 
 Once signed in you can:
-1. **Write a story:** go to Posts, click **New post**, fill in the title, category, author, short description, cover image and article text, then save.
+1. **Write a story:** go to **Publish**, click **New post**, and fill in the headline, category, author, photos, short description and article text. A **live preview** of the real site updates as you type (switch between **Story page** / **Homepage card** and **Desktop** / **Phone**). A blank line starts a new paragraph and a single line break stays a line break. Use **Tidy spacing** to clean up pasted text (it also runs automatically when you save), then click **Save post**. Drag and drop works for the cover and extra photos.
    Use the **Date posted** field to back-date a story (for example, one you forgot to post on time). The date shown on the site and the order of stories follow it.
 2. **Save a draft:** untick **Published** to keep a story hidden until it's ready.
 3. **Feature a story:** tick **Featured on homepage** to show it in the top spotlight.
@@ -50,6 +50,7 @@ This repository contains the whole site. No build step is needed.
 | --- | --- |
 | `index.html` | The public website |
 | `admin.html` | The editors' control panel |
+| `render.js` | Shared story renderer used by both the site and the admin live preview, so they always look the same |
 | `config.js` | Supabase project URL and public (anon) key |
 | `supabase-setup.sql` | Database tables, storage, security rules, comments and likes |
 | `scripts/sync-facebook.mjs` | Copies new Facebook Page posts to the site |

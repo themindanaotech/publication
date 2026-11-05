@@ -53,6 +53,29 @@ img.pv{max-height:90px;border-radius:2px;margin-top:8px;display:block}.hint{colo
 .lights{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-around}.lights i{width:9px;height:9px;border-radius:50%;background:var(--hi);animation:tw 2s infinite;box-shadow:0 0 10px var(--hi)}.lights i:nth-child(3n){background:var(--acc);animation-delay:.6s}.lights i:nth-child(3n+1){background:#3ba55c;animation-delay:1.2s}@keyframes tw{50%{opacity:.25}}
 .hide{display:none!important}@media(max-width:700px){.row{grid-template-columns:1fr}#who{display:none}.item{flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition:none!important}}
+/* Publish editor */
+body.editing .wrap{max-width:1500px}
+#pf{margin-top:16px}.ed-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}.ed-top h3{flex:1;font-size:20px}
+.seg{display:inline-flex}.seg button{border-radius:0;padding:6px 12px;font:600 12px var(--mo);letter-spacing:.04em}.seg button+button{margin-left:-1px}.seg button.on{background:var(--hi);color:#111;border-color:var(--hi);position:relative}
+.ed{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:20px;align-items:start}
+.ed-form .box{margin-bottom:16px}.ed-form h4{font:800 12px var(--mo);letter-spacing:.14em;text-transform:uppercase;color:var(--hi)}.ed-form h4+label{margin-top:10px}
+.ed-form textarea[name=body]{min-height:380px;font-size:16px;line-height:1.7}
+.cnt{float:right;font-weight:400;font-size:12px;color:var(--mute)}
+.bodytools{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:2px 0 8px}.bodytools button{padding:5px 12px;font-size:13px}.bodytools .hint{margin:0}
+.drop{border:2px dashed var(--line);padding:12px;transition:.2s}.drop.over{border-color:var(--hi);background:color-mix(in srgb,var(--hi) 10%,transparent)}
+.dz{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.dz .hint{margin:0}
+.cov{aspect-ratio:16/9;max-width:380px;background:var(--main) center/cover no-repeat;border:1px solid var(--line);margin-bottom:12px}
+.galed{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-bottom:12px}
+.gt{position:relative;aspect-ratio:4/3;background:var(--main)}.gt img{width:100%;height:100%;object-fit:cover;display:block;border:1px solid var(--line)}
+.gt .n{position:absolute;top:4px;left:4px;background:#000b;color:#fff;font:700 11px var(--mo);padding:1px 7px;border-radius:99px}
+.gc{position:absolute;right:4px;bottom:4px;display:flex;gap:3px}.gc button{padding:0 8px;line-height:24px;background:#000b;color:#fff;border:0}
+.ed-prev{position:sticky;top:84px;min-width:0}.pv-bar{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px}
+.pv-stage{border:1px solid var(--line);background:var(--main);height:calc(100vh - 200px);min-height:420px;overflow:hidden}
+.pv-clip{transform-origin:top left}#pvFrame{border:0;display:block;background:var(--main)}.pv-stage.phone{background:var(--slate)}.pv-stage.phone .pv-clip{box-shadow:0 0 0 1px var(--line),0 10px 40px #0008}
+.ed-bar{position:sticky;bottom:0;z-index:15;display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:color-mix(in srgb,var(--main) 94%,transparent);backdrop-filter:blur(10px);border-top:3px solid var(--hi);padding:12px 16px}
+.ed-bar .chk{margin:0}.ed-bar .sp{flex:1}.ed-bar .hint{margin:0}
+@media(min-width:1001px){#mobSeg{display:none}}
+@media(max-width:1000px){.ed{grid-template-columns:minmax(0,1fr)}.ed.w .ed-prev{display:none}.ed:not(.w) .ed-form{display:none}.ed-prev{position:static}.pv-stage{height:70vh}}
 </style></head><body>
 <div id="login"><div class="lg">
 <div id="lgLogo"></div>
@@ -71,20 +94,38 @@ img.pv{max-height:90px;border-radius:2px;margin-top:8px;display:block}.hint{colo
 <div id="app" class="hide">
 <header><div class="wrap"><div class="brand"><span id="hLogo"></span><span>THE <em>MINDANAO</em> TECH <small>ADMIN</small></span></div><span id="who"></span><a class="b" href="index.html" target="_blank">View site</a><button id="out">Sign out</button></div></header>
 <div class="wrap">
-<div class="tabs"><button data-t="posts" class="on">Posts</button><button data-t="menu">Menu</button><button data-t="look">Appearance</button><button data-t="themes">Themes</button><button data-t="subs">Subscribers</button><button data-t="comments">Comments</button><button data-t="team">Team</button><button data-t="admins">Admins</button></div>
+<div class="tabs"><button data-t="posts" class="on">Publish</button><button data-t="menu">Menu</button><button data-t="look">Appearance</button><button data-t="themes">Themes</button><button data-t="subs">Subscribers</button><button data-t="comments">Comments</button><button data-t="team">Team</button><button data-t="admins">Admins</button></div>
 
-<section id="t-posts"><div class="box">
-<div class="item" style="border:0"><div><h3>All posts</h3></div><button class="p" id="newPost">New post</button></div><div id="plist"></div></div>
-<form id="pf" class="box hide" style="margin-top:16px">
-<h3 id="pfT">New post</h3><label>Title</label><input type="text" name="title" required>
+<section id="t-posts"><div class="box" id="plistBox">
+<div class="item" style="border:0"><div><h3>Publish</h3><span>Write a story and watch a live preview of the real site as you type.</span></div><button class="p" id="newPost">New post</button></div><div id="plist"></div></div>
+<form id="pf" class="hide" autocomplete="off">
+<div class="ed-top"><h3 id="pfT">New post</h3><div class="seg" id="mobSeg"><button type="button" data-v="write" class="on">Write</button><button type="button" data-v="prev">Preview</button></div></div>
+<div class="ed" id="ed">
+<div class="ed-form">
+<div class="box"><h4>1 &middot; Details</h4>
+<label>Headline</label><input type="text" name="title" required>
 <div class="row"><div><label>Category</label><select name="category"></select></div><div><label>Author</label><input type="text" name="author"></div></div>
-<label>Date posted <small>change it to back-date a story, e.g. one you forgot to post on time</small></label><input type="date" name="pdate">
-<label>Short description <small>shown on cards</small></label><input type="text" name="excerpt">
-<label>Cover image</label><input type="file" id="pimg" accept="image/*"><input type="hidden" name="image"><img class="pv hide" id="ppv" alt="">
-<label>More photos <small>shown right after the cover image. You can pick several at once.</small></label><input type="file" id="gimg" accept="image/*" multiple><div id="gal" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px"></div>
-<label>Article text <small>leave a blank line between paragraphs</small></label><textarea name="body"></textarea>
-<div class="chk"><label><input type="checkbox" name="published" checked> Published</label><label><input type="checkbox" name="featured"> Featured on homepage</label></div>
-<button class="p">Save post</button> <button type="button" id="pcancel">Cancel</button></form></section>
+<label>Date posted <small>change it to back-date a story, e.g. one you forgot to post on time</small></label><input type="date" name="pdate"></div>
+<div class="box"><h4>2 &middot; Photos</h4>
+<label>Cover image <small>top of the story and on cards, cropped to 16:9</small></label>
+<div class="drop" id="covDrop"><div id="covBox" class="cov hide"></div><div class="dz"><button type="button" id="covPick">Choose cover image</button><button type="button" class="d hide" id="covRm">Remove</button><span class="hint">or drop an image here</span></div></div>
+<input type="file" id="pimg" accept="image/*" class="hide"><input type="hidden" name="image">
+<label>More photos <small>shown right after the cover. Pick or drop several at once.</small></label>
+<div class="drop" id="galDrop"><div id="gal" class="galed hide"></div><div class="dz"><button type="button" id="galPick">Add photos</button><span class="hint">or drop images here</span></div></div>
+<input type="file" id="gimg" accept="image/*" multiple class="hide"></div>
+<div class="box"><h4>3 &middot; Story</h4>
+<label>Short description <small>shown under the headline and on cards</small> <span class="cnt" id="exCnt"></span></label><input type="text" name="excerpt">
+<label>Article text <small>blank line = new paragraph &middot; a single line break stays a line break</small></label>
+<div class="bodytools"><button type="button" id="tidyBtn">Tidy spacing</button><span class="hint" id="bodyStat"></span></div>
+<textarea name="body"></textarea>
+<p class="hint hide" id="emoNote">Emojis are hidden on the website, so readers won't see them.</p></div>
+</div>
+<aside class="ed-prev"><div class="pv-bar"><div class="seg" id="pvMode"><button type="button" data-m="article" class="on">Story page</button><button type="button" data-m="card">Homepage card</button></div><div class="seg" id="pvDev"><button type="button" data-d="desktop" class="on">Desktop</button><button type="button" data-d="phone">Phone</button></div></div>
+<div class="pv-stage" id="pvStage"><div class="pv-clip" id="pvClip"><iframe id="pvFrame" title="Live preview of the story"></iframe></div></div>
+<p class="hint">This uses the real site's styling, so spacing, line breaks and crops match what readers get.</p></aside>
+</div>
+<div class="ed-bar"><div class="chk"><label><input type="checkbox" name="published" checked> Published</label><label><input type="checkbox" name="featured"> Featured on homepage</label></div><span class="sp"></span><span class="hint" id="dirty"></span><button type="button" id="pcancel">Cancel</button><button class="p" id="psave">Save post</button></div>
+</form></section>
 
 <section id="t-menu" class="hide"><div class="box"><h3>Menu &amp; categories</h3><span class="hint" style="display:block;margin:4px 0 14px">Home and About Us are always first and last. Add sections and subsections here: each one appears in the site menu and in the post form's Category list. Sections with no subsections hold posts themselves.</span>
 <form id="mf" style="display:flex;gap:8px"><input type="text" id="mname" placeholder="New section, e.g. Multimedia" required maxlength="30" autocomplete="off"><button class="p">Add section</button></form></div><div id="mlist"></div></section>
@@ -143,7 +184,7 @@ img.pv{max-height:90px;border-radius:2px;margin-top:8px;display:block}.hint{colo
 </div></div><div id="msg"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="config.js"></script><script src="theme.js"></script>
+<script src="config.js"></script><script src="theme.js"></script><script src="render.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -179,7 +220,7 @@ $("#lf").onsubmit=async e=>{e.preventDefault();const b=$("#go"),er=$("#lerr");er
 $("#eye").onclick=()=>{const p=$("#pw"),h=p.type=="password";p.type=h?"text":"password";$("#eye").textContent=h?"Hide":"Show"};
 $("#out").onclick=async()=>{await db.auth.signOut();start()};
 const TABS=["posts","menu","cats","look","themes","subs","comments","team","admins"];
-document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x==b));TABS.forEach(t=>$("#t-"+t).classList.toggle("hide",t!=b.dataset.t))});
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x==b));TABS.forEach(t=>$("#t-"+t).classList.toggle("hide",t!=b.dataset.t));document.body.classList.toggle("editing",!$("#pf").classList.contains("hide")&&["posts","cats"].includes(b.dataset.t))});
 
 async function load(){
   const f=$("#sf");for(const k in S)if(f.elements[k])f.elements[k].value=S[k];pv($("#lpv"),S.logo);
@@ -189,25 +230,79 @@ async function loadPosts(){
   const {data}=await db.from("posts").select("*").order("created_at",{ascending:false});POSTS=data||[];
   drawPosts();drawCats();
 }
-const postRow=p=>`<div class="item"><div><b>${esc(p.title)}</b><span class="pill ${p.published?"":"dr"}">${p.published?"Published":"Draft"}</span>${p.featured?'<span class="pill">Featured</span>':""}<br><span>${esc(p.category)} &middot; ${new Date(p.created_at).toLocaleDateString()}</span></div><button data-e="${p.id}">Edit</button><button class="d" data-d="${p.id}">Delete</button></div>`;
+const postRow=p=>`<div class="item"><div><b>${esc(p.title)}</b><span class="pill ${p.published?"":"dr"}">${p.published?"Published":"Draft"}</span>${p.featured?'<span class="pill">Featured</span>':""}<br><span>${esc(p.category)} &middot; ${new Date(p.created_at).toLocaleDateString()}</span></div>${p.published?`<a class="b" href="index.html#p-${p.id}" target="_blank">View</a>`:""}<button data-e="${p.id}">Edit</button><button class="d" data-d="${p.id}">Delete</button></div>`;
 function drawPosts(){$("#plist").innerHTML=POSTS.map(postRow).join("")||"<p style='color:#a9b0be'>No posts yet. Click New post.</p>"}
-const PHRE=/\n*\[\[photos\]\]([\s\S]*?)\[\[\/photos\]\]\s*$/;let GAL=[];
-function drawGal(){$("#gal").innerHTML=GAL.map((u,i)=>`<div style="position:relative"><img src="${esc(u)}" alt="" style="width:110px;height:80px;object-fit:cover;border:1px solid var(--line);display:block"><button type="button" data-g="${i}" aria-label="Remove photo" style="position:absolute;top:2px;right:2px;padding:0 7px;line-height:22px;background:#000a;color:#fff">&times;</button>${i?`<button type="button" data-l="${i}" aria-label="Move earlier" style="position:absolute;bottom:2px;left:2px;padding:0 7px;line-height:22px;background:#000a;color:#fff">&larr;</button>`:""}</div>`).join("")}
-$("#gal").onclick=e=>{const d=e.target.dataset;if(d.g!=null){GAL.splice(+d.g,1);drawGal()}if(d.l!=null){const i=+d.l;[GAL[i-1],GAL[i]]=[GAL[i],GAL[i-1]];drawGal()}};
-$("#gimg").onchange=async e=>{const b=e.target.files;if(!b.length)return;say("Uploading "+b.length+" photo"+(b.length>1?"s":"")+"...");for(const f of b){const u=await upload(f);if(u)GAL.push(u)}e.target.value="";drawGal();say("Photos added")};
+/* ---- Publish editor: the form on the left, a live preview of the real site on the right ---- */
+const PHRE=/\n*\[\[photos\]\]([\s\S]*?)\[\[\/photos\]\]\s*$/;
+let GAL=[],DIRTY=false,BUSY=0,PVM="article",PVD="desktop",PVREADY=false,PVCSS=null,PVT=0,ORIGD="";
 const ymd=d=>{d=new Date(d);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
-let ORIGD="";
+const FE=()=>$("#pf").elements,segSet=(sel,k,v)=>document.querySelectorAll(sel+" button").forEach(b=>b.classList.toggle("on",b.dataset[k]==v));
+const markDirty=()=>{DIRTY=true;$("#dirty").textContent="Unsaved changes"};
+function busy(n){BUSY+=n;const b=$("#psave");b.disabled=BUSY>0;b.textContent=BUSY>0?"Uploading...":"Save post"}
+async function up(file){busy(1);try{return await upload(file)}finally{busy(-1)}}
+
+// Cover + extra photos (choose a file or drag and drop)
+function setCover(u){FE().image.value=u||"";const c=$("#covBox");c.style.backgroundImage=u?'url("'+u.replace(/"/g,"%22")+'")':"";c.classList.toggle("hide",!u);$("#covRm").classList.toggle("hide",!u);$("#covPick").textContent=u?"Replace cover":"Choose cover image"}
+function dropZone(el,fn){["dragenter","dragover"].forEach(t=>el.addEventListener(t,e=>{e.preventDefault();el.classList.add("over")}));["dragleave","drop"].forEach(t=>el.addEventListener(t,e=>{e.preventDefault();el.classList.remove("over")}));
+  el.addEventListener("drop",e=>{const fs=[...e.dataTransfer.files].filter(x=>x.type.startsWith("image/"));if(fs.length)fn(fs)})}
+async function addCover(file){if(!file)return;say("Uploading cover...");const u=await up(file);if(u){setCover(u);markDirty();sched()}}
+$("#pimg").onchange=async e=>{await addCover(e.target.files[0]);e.target.value=""};$("#covPick").onclick=()=>$("#pimg").click();
+$("#covRm").onclick=()=>{setCover("");markDirty();sched()};dropZone($("#covDrop"),fs=>addCover(fs[0]));
+async function addPhotos(fs){if(!fs.length)return;say("Uploading "+fs.length+" photo"+(fs.length>1?"s":"")+"...");for(const f of fs){const u=await up(f);if(u)GAL.push(u)}drawGal();markDirty();sched();say("Photos added")}
+$("#gimg").onchange=async e=>{await addPhotos([...e.target.files]);e.target.value=""};$("#galPick").onclick=()=>$("#gimg").click();dropZone($("#galDrop"),addPhotos);
+function drawGal(){$("#gal").innerHTML=GAL.map((u,i)=>`<div class="gt"><img src="${esc(u)}" alt=""><span class="n">${i+1}</span><div class="gc">${i?`<button type="button" data-l="${i}" aria-label="Move earlier">&larr;</button>`:""}${i<GAL.length-1?`<button type="button" data-r="${i}" aria-label="Move later">&rarr;</button>`:""}<button type="button" data-g="${i}" aria-label="Remove photo">&times;</button></div></div>`).join("");$("#gal").classList.toggle("hide",!GAL.length)}
+$("#gal").onclick=e=>{const b=e.target.closest("button");if(!b)return;const d=b.dataset;
+  if(d.g!=null)GAL.splice(+d.g,1);else if(d.l!=null){const i=+d.l;[GAL[i-1],GAL[i]]=[GAL[i],GAL[i-1]]}else if(d.r!=null){const i=+d.r;[GAL[i+1],GAL[i]]=[GAL[i],GAL[i+1]]}else return;
+  drawGal();markDirty();sched()};
+
+// Counters + spacing helper
+function stats(){const f=FE();$("#exCnt").textContent=f.excerpt.value.length?f.excerpt.value.length+" characters":"";
+  const t=MTR.tidy(f.body.value),w=MTR.words(t),ps=t?t.split(/\n\s*\n/).length:0;
+  $("#bodyStat").textContent=w?`${w} words \u00b7 ${ps} paragraph${ps==1?"":"s"} \u00b7 ${MTR.mins(t)} min read`:"Nothing written yet";
+  $("#emoNote").classList.toggle("hide",!(MTR.hasEmoji(f.title.value)||MTR.hasEmoji(f.excerpt.value)||MTR.hasEmoji(f.body.value)))}
+$("#tidyBtn").onclick=()=>{const f=FE(),one=s=>String(s).replace(/\s+/g," ").trim();f.body.value=MTR.tidy(f.body.value);f.title.value=one(f.title.value);f.excerpt.value=one(f.excerpt.value);f.author.value=one(f.author.value);markDirty();stats();sched();say("Spacing tidied")};
+
+// Live preview: the real site's own CSS is loaded from index.html, so the preview can't drift from the site.
+const PV_FALLBACK="*{box-sizing:border-box;margin:0}body{font:16px/1.65 var(--in);background:var(--main);color:var(--text)}.wrap{max-width:1180px;margin:0 auto;padding:0 20px}.art{max-width:720px;margin:0 auto}.art h1{font:900 40px/1.15 var(--pf);margin:12px 0 14px}.thumb{aspect-ratio:16/9;position:relative;background:var(--slate);margin:24px 0}.thumb i{position:absolute;inset:0;background:center/cover}.body p{font-size:18px;line-height:1.85;margin-bottom:22px}.gal{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.gal img{width:100%;display:block}.tag,.crumb{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--hi)}.meta,.byl{color:var(--mute);font-size:14px;display:flex;gap:10px;flex-wrap:wrap}";
+async function pvCSS(){if(PVCSS!==null)return PVCSS;
+  try{const r=await fetch("index.html",{cache:"no-cache"});if(!r.ok)throw 0;const d=new DOMParser().parseFromString(await r.text(),"text/html");PVCSS=[...d.querySelectorAll("style")].map(x=>x.textContent).join("\n")||PV_FALLBACK}catch(e){PVCSS=PV_FALLBACK}return PVCSS}
+async function pvStart(){PVREADY=false;const css=await pvCSS(),fr=$("#pvFrame"),logo=esc(S.logo||"logo.png");
+  fr.onload=()=>{const d=fr.contentDocument;d.addEventListener("click",e=>{if(e.target.closest("a,button"))e.preventDefault()});PVREADY=true;pvDraw();fit()};
+  fr.srcdoc=`<!DOCTYPE html><html lang="en" style="${esc(document.documentElement.style.cssText)}"><head><meta charset="utf-8"><style>${css}</style><style>html,body{overflow-x:hidden}main{animation:none!important}</style></head><body><header><div class="wrap"><div class="top"><div class="brand"><img class="logo" src="${logo}" alt=""><span>THE <em>MINDANAO</em> TECH</span></div></div></div></header><main><div class="wrap" id="stage"></div></main></body></html>`}
+const parentOf=c=>{const m=getMenu().find(x=>x.n==c||(x.s||[]).includes(c));return m?m.n:c};
+function pvData(){const f=FE();let d=new Date();if(f.pdate.value){const [y,m,dd]=f.pdate.value.split("-").map(Number);d=new Date(y,m-1,dd,12)}
+  return{title:f.title.value,category:f.category.value,author:f.author.value,excerpt:f.excerpt.value,image:f.image.value,body:f.body.value.replace(PHRE,""),pics:GAL,created_at:d}}
+function pvDraw(){if(!PVREADY)return;const d=$("#pvFrame").contentDocument,st=d&&d.getElementById("stage");if(!st)return;const a=pvData();
+  st.innerHTML=PVM=="card"?`<div style="max-width:340px;margin:28px auto">${MTR.card(a)}</div>`:MTR.article(a,{parent:parentOf,team:S.team})}
+function fit(){const st=$("#pvStage"),cl=$("#pvClip"),fr=$("#pvFrame"),aw=st.clientWidth;if(aw<50)return;
+  const W=PVD=="phone"?390:960,sc=Math.min(1,aw/W);st.classList.toggle("phone",PVD=="phone");
+  fr.style.width=cl.style.width=W+"px";fr.style.height=Math.round(st.clientHeight/sc)+"px";cl.style.transform=`scale(${sc})`;cl.style.marginLeft=Math.max(0,(aw-W*sc)/2)+"px"}
+function sched(){clearTimeout(PVT);PVT=setTimeout(()=>{stats();pvDraw()},120)}
+new ResizeObserver(fit).observe($("#pvStage"));
+$("#pf").addEventListener("input",()=>{markDirty();sched()});$("#pf").addEventListener("change",()=>{markDirty();sched()});
+$("#pvMode").onclick=e=>{const b=e.target.closest("button");if(!b)return;PVM=b.dataset.m;segSet("#pvMode","m",PVM);pvDraw()};
+$("#pvDev").onclick=e=>{const b=e.target.closest("button");if(!b)return;PVD=b.dataset.d;segSet("#pvDev","d",PVD);fit()};
+$("#mobSeg").onclick=e=>{const b=e.target.closest("button");if(!b)return;const w=b.dataset.v=="write";segSet("#mobSeg","v",b.dataset.v);$("#ed").classList.toggle("w",w);if(!w){fit();pvDraw()}};
+addEventListener("beforeunload",e=>{if(DIRTY&&!$("#pf").classList.contains("hide")){e.preventDefault();e.returnValue=""}});
+
 function openForm(p,cat){
-  editing=p?p.id:null;const f=$("#pf");f.reset();fillCats();if(cat)f.elements.category.value=cat;$("#pfT").textContent=p?"Edit post":"New post";
-  if(p)for(const k of ["title","category","author","excerpt","image","body"])f.elements[k].value=p[k]||"";
-  const gm=p&&(p.body||"").match(PHRE);GAL=gm?gm[1].split("\n").map(x=>x.trim()).filter(Boolean):[];if(gm)f.elements.body.value=p.body.replace(PHRE,"");drawGal();
-  ORIGD=ymd(p?p.created_at:new Date());f.elements.pdate.value=ORIGD;
-  f.elements.published.checked=p?p.published:true;f.elements.featured.checked=p?!!p.featured:false;
-  pv($("#ppv"),p&&p.image);f.classList.remove("hide");f.scrollIntoView({behavior:"smooth"});
+  editing=p?p.id:null;const f=$("#pf"),E=f.elements;f.reset();fillCats();
+  if(p&&p.category&&![...E.category.options].some(o=>o.value==p.category))E.category.add(new Option(p.category,p.category));
+  if(cat)E.category.value=cat;if(p&&p.category)E.category.value=p.category;
+  $("#pfT").textContent=p?"Edit post":"New post";
+  for(const k of ["title","author","excerpt","body"])E[k].value=p?(p[k]||""):"";
+  const gm=p&&(p.body||"").match(PHRE);GAL=gm?gm[1].split("\n").map(x=>x.trim()).filter(Boolean):[];if(gm)E.body.value=p.body.replace(PHRE,"");
+  ORIGD=ymd(p?p.created_at:new Date());E.pdate.value=ORIGD;
+  E.published.checked=p?p.published:true;E.featured.checked=p?!!p.featured:false;
+  setCover(p&&p.image||"");drawGal();DIRTY=false;$("#dirty").textContent="";busy(0);
+  $("#plistBox").classList.toggle("hide",f.parentElement.id==="t-posts");
+  document.body.classList.add("editing");$("#ed").classList.add("w");segSet("#mobSeg","v","write");if(innerWidth<700){PVD="phone";segSet("#pvDev","d","phone")}
+  f.classList.remove("hide");stats();pvStart();f.scrollIntoView({behavior:"smooth"});
 }
 // Post form lives under Posts by default; inside a category view it moves there so uploads happen "in" that category.
-const closeForm=()=>{$("#pf").classList.add("hide");$("#t-posts").appendChild($("#pf"))};
-$("#newPost").onclick=()=>{$("#t-posts").appendChild($("#pf"));openForm(null)};$("#pcancel").onclick=closeForm;
+function closeForm(force){const f=$("#pf");if(!force&&DIRTY&&!confirm("Discard your changes to this post?"))return;
+  f.classList.add("hide");$("#t-posts").appendChild(f);$("#plistBox").classList.remove("hide");document.body.classList.remove("editing");DIRTY=false;PVREADY=false}
+$("#newPost").onclick=()=>{$("#t-posts").appendChild($("#pf"));openForm(null)};$("#pcancel").onclick=()=>closeForm();
 const rowClick=async e=>{const i=e.target.dataset,inCat=!$("#cView").classList.contains("hide")&&$("#cView").contains(e.target);
   if(i.e){const p=POSTS.find(p=>p.id==i.e);if(inCat)$("#cFormHost").appendChild($("#pf"));else $("#t-posts").appendChild($("#pf"));openForm(p,p.category)}
   if(i.d&&confirm("Delete this post for good?")){await db.from("posts").delete().eq("id",i.d);say("Post deleted");loadPosts()}};
@@ -253,11 +348,14 @@ function drawCatView(){$("#cvT").textContent=CUR;const l=inCat(CUR);$("#cvS").te
   $("#cvPosts").innerHTML=l.map(postRow).join("")||"<p class='hint'>Nothing here yet. Click &ldquo;New post in this category&rdquo;.</p>"}
 $("#cBack").onclick=()=>{CUR=null;closeForm();$("#cView").classList.add("hide");$("#cList").classList.remove("hide")};
 $("#cvNew").onclick=()=>{$("#cFormHost").appendChild($("#pf"));openForm(null,CUR)};
-$("#pimg").onchange=async e=>{const u=await upload(e.target.files[0]);if(u){$("#pf").elements.image.value=u;pv($("#ppv"),u)}};
-$("#pf").onsubmit=async e=>{e.preventDefault();const f=e.target,row={title:f.title.value,category:f.category.value,author:f.author.value,excerpt:f.excerpt.value,body:f.body.value.replace(PHRE,"").trimEnd()+(GAL.length?"\n\n[[photos]]\n"+GAL.join("\n")+"\n[[/photos]]":""),image:f.image.value,published:f.published.checked,featured:f.featured.checked};
+$("#pf").onsubmit=async e=>{e.preventDefault();if(BUSY)return say("Please wait for the uploads to finish.");
+  const f=e.target,E=f.elements,one=s=>String(s).replace(/\s+/g," ").trim(),txt=MTR.tidy(E.body.value.replace(PHRE,""));
+  if(!one(E.title.value))return say("Please add a headline.");
+  const row={title:one(E.title.value),category:E.category.value,author:one(E.author.value),excerpt:one(E.excerpt.value),body:txt+(GAL.length?(txt?"\n\n":"")+"[[photos]]\n"+GAL.join("\n")+"\n[[/photos]]":""),image:E.image.value,published:E.published.checked,featured:E.featured.checked};
   if(f.pdate.value&&f.pdate.value!==ORIGD){const [y,m,d]=f.pdate.value.split("-").map(Number);row.created_at=new Date(y,m-1,d,12,0,0).toISOString()}
+  const b=$("#psave");b.disabled=true;b.textContent="Saving...";
   const r=editing?await db.from("posts").update(row).eq("id",editing):await db.from("posts").insert(row);
-  if(r.error)return say(r.error.message);say("Saved");closeForm();loadPosts()};
+  busy(0);if(r.error)return say(r.error.message);say("Saved");closeForm(true);loadPosts()};
 $("#limg").onchange=async e=>{const u=await upload(e.target.files[0]);if(u){$("#sf").elements.logo.value=u;pv($("#lpv"),u)}};
 $("#sf").onsubmit=async e=>{e.preventDefault();const f=e.target,d={...S};for(const el of f.elements)if(el.name)d[el.name]=el.value;
   const r=await db.from("settings").upsert({id:1,data:d});r.error?say(r.error.message):(say("Settings saved. Refresh the site to see them."),S=d,fillCats(),drawCats())};
