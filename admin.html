@@ -126,6 +126,7 @@ img.pv{max-height:90px;border-radius:2px;margin-top:8px;display:block}.hint{colo
 <div class="box"><div class="item" style="border:0"><div><h3>Team</h3><span>People shown on the website's "Our Team" page, in this order. The group called Developer is also credited in the site footer. Rename, add or remove groups however you like (Adviser, Executive Board, Board Members, Staff Writers...).</span></div><button class="p" id="gnew">Add group</button></div><div id="tgroups"></div></div>
 <form id="mf" class="box hide" style="margin-top:16px"><h3 id="mfT">Add member</h3>
 <div class="row"><div><label>Name</label><input type="text" name="mname" required maxlength="80" autocomplete="off"></div><div><label>Position <small>e.g. Editor-in-Chief</small></label><input type="text" name="mrole" maxlength="80" autocomplete="off"></div></div>
+<label>About <small>short bio shown on the author page</small></label><textarea name="mbio" rows="4" maxlength="1200"></textarea>
 <label>Group</label><select name="mgroup"></select>
 <label>Photo <small>a clear, front-facing photo works best. It is shrunk automatically.</small></label><input type="file" id="mimg" accept="image/*"><input type="hidden" name="mphoto"><img class="pv hide" id="mpv" alt="">
 <p style="margin-top:16px"><button class="p">Save member</button> <button type="button" id="mcancel">Cancel</button></p></form></section>
@@ -299,7 +300,7 @@ function drawTeam(){const T=getTeam();
   const sel=$("#mf").elements.mgroup,v=sel.value;sel.innerHTML=T.map(g=>`<option value="${esc(g.id)}">${esc(g.title)}</option>`).join("");if(v)sel.value=v}
 let MEDIT=null;
 function openMember(gid,m){const f=$("#mf");f.reset();MEDIT=m?{g:gid,id:m.id}:null;$("#mfT").textContent=m?"Edit member":"Add member";drawTeam();
-  f.elements.mgroup.value=gid;f.elements.mname.value=m?m.name:"";f.elements.mrole.value=m?m.role||"":"";f.elements.mphoto.value=m?m.photo||"":"";pv($("#mpv"),m&&m.photo);
+  f.elements.mgroup.value=gid;f.elements.mname.value=m?m.name:"";f.elements.mrole.value=m?m.role||"":"";f.elements.mbio.value=m?m.bio||"":"";f.elements.mphoto.value=m?m.photo||"":"";pv($("#mpv"),m&&m.photo);
   f.classList.remove("hide");f.scrollIntoView({behavior:"smooth"})}
 $("#gnew").onclick=()=>{const n=prompt("Group name (e.g. Staff Writers):");if(!n||!n.trim())return;getTeam().push({id:"g"+uid(),title:n.trim().slice(0,50),members:[]});saveTeam("Group added")};
 $("#tgroups").onchange=e=>{if(!e.target.classList.contains("gt"))return;const g=getTeam().find(x=>x.id==e.target.dataset.g);if(!g)return;const v=e.target.value.trim();if(!v){e.target.value=g.title;return}g.title=v.slice(0,50);saveTeam("Group renamed")};
@@ -316,7 +317,7 @@ $("#tgroups").onclick=async e=>{const d=e.target.closest("button")?.dataset;if(!
 $("#mimg").onchange=async e=>{const f=e.target.files[0];if(!f)return;say("Uploading photo...");const u=await upload(await shrink(f));if(u){$("#mf").elements.mphoto.value=u;pv($("#mpv"),u)}};
 $("#mcancel").onclick=()=>{$("#mf").classList.add("hide");MEDIT=null};
 $("#mf").onsubmit=async e=>{e.preventDefault();const E=e.target.elements,T=getTeam(),to=T.find(x=>x.id==E.mgroup.value);if(!to)return say("Please pick a group.");
-  const row={id:MEDIT?MEDIT.id:"m"+uid(),name:E.mname.value.trim(),role:E.mrole.value.trim(),photo:E.mphoto.value};if(!row.name)return;
+  const row={id:MEDIT?MEDIT.id:"m"+uid(),name:E.mname.value.trim(),role:E.mrole.value.trim(),bio:E.mbio.value.trim(),photo:E.mphoto.value};if(!row.name)return;
   if(MEDIT){const from=T.find(x=>x.id==MEDIT.g),i=from?from.members.findIndex(x=>x.id==MEDIT.id):-1;
     if(i>=0&&from.id==to.id)from.members[i]=row; // same group: keep the same spot
     else{if(i>=0)from.members.splice(i,1);to.members.push(row)}}

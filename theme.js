@@ -25,7 +25,7 @@ anniversary:'<path d="M50 6 92 26 50 46 8 26z" fill="#1b1b1f" stroke="#000" stro
 custom:'<path d="M50 4l9 22 23 2-17 15 6 23-21-13-21 13 6-23L18 28l23-2z" fill="#f4b344" stroke="#6b4a10" stroke-width="2.5" stroke-linejoin="round" transform="translate(0 -2) scale(1 .9)"/>'};
 let CURT=null,obs=null;
 function unwrap(){document.querySelectorAll(".mt-acc").forEach(e=>e.remove());document.querySelectorAll(".mt-lw").forEach(w=>{const i=w.querySelector("img");if(i)w.replaceWith(i);else w.remove()})}
-function decorate(){if(!CURT)return;const svg=ACC[CURT.id]||(CURT.custom?ACC.custom:null);if(!svg)return;
+function decorate(){return;if(!CURT)return;const svg=ACC[CURT.id]||(CURT.custom?ACC.custom:null);if(!svg)return;
   document.querySelectorAll("img.logo,#sLogo,.lg img").forEach(i=>{if(i.closest(".mt-lw")||i.closest("#seasonal")||!i.parentNode)return;
     const w=document.createElement("span");w.className="mt-lw"+(i.id=="sLogo"?" big":"");i.replaceWith(w);w.appendChild(i);
     const a=document.createElement("span");a.className="mt-acc";a.setAttribute("aria-hidden","true");a.innerHTML=`<svg viewBox="0 0 100 64" preserveAspectRatio="xMidYMax meet">${svg}</svg>`;w.appendChild(a)})}
