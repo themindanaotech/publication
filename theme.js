@@ -43,7 +43,7 @@ function apply(t,logo){const r=document.documentElement.style,c=t||D;
   const b=document.createElement("div");b.id="seasonal";if(t.banner)b.style.backgroundImage=`linear-gradient(90deg,var(--main),transparent 60%),url("${t.banner}")`;
   b.innerHTML=`<img src="${logo}" alt="" onerror="this.remove()"><span>${(t.msg||t.name||"").replace(/</g,"&lt;")}</span>`;
   document.body.prepend(b);
-  if(t.anim===false||matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+  if(true||t.anim===false||matchMedia("(prefers-reduced-motion:reduce)").matches)return;
   const g=document.createElement("div");g.className="mt-deco";g.setAttribute("aria-hidden","true");
   if(t.lights)g.innerHTML='<div class="lights">'+"<i></i>".repeat(24)+"</div>";
   const d=t.deco&&t.deco.length?t.deco:["✦"];

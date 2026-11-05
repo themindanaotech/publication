@@ -2,22 +2,14 @@
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Mindanao Tech</title><link id="ico" rel="icon" href="logo.png">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:wght@400;700&family=Montserrat:wght@500;600;700;800&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{--main:#080e19;--slate:#172235;--hi:#f4b344;--text:#f5f1e8;--acc:#f4b344;--mute:#a9b0be;--line:#ffffff1f;--bgimg:none;--pf:'Playfair Display',Georgia,serif;--mw:'Merriweather',Georgia,serif;--mo:'Montserrat',system-ui,sans-serif;--in:'Inter',system-ui,sans-serif}
+@font-face{font-family:'Neue Haas Display';src:local('Neue Haas Display Light'),url(fonts/NeueHaasDisplayLight.ttf) format('truetype');font-weight:300;font-display:swap}@font-face{font-family:'Neue Haas Display';src:local('Neue Haas Display Roman'),url(fonts/NeueHaasDisplayRoman.ttf) format('truetype');font-weight:400;font-display:swap}@font-face{font-family:'Neue Haas Display';src:local('Neue Haas Display Medium'),url(fonts/NeueHaasDisplayMediu.ttf) format('truetype');font-weight:500;font-display:swap}@font-face{font-family:'Neue Haas Display';src:local('Neue Haas Display Bold'),url(fonts/NeueHaasDisplayBold.ttf) format('truetype');font-weight:700;font-display:swap}@font-face{font-family:'Neue Haas Display';src:local('Neue Haas Display Black'),url(fonts/NeueHaasDisplayBlack.ttf) format('truetype');font-weight:900;font-display:swap}
+:root{--main:#080e19;--slate:#172235;--hi:#f4b344;--text:#f5f1e8;--acc:#f4b344;--mute:#a9b0be;--line:#ffffff1f;--bgimg:none;--nh:'Neue Haas Display','Neue Haas Grotesk Display Pro','Helvetica Neue',Helvetica,Arial,sans-serif;--pf:var(--nh);--mw:var(--nh);--mo:var(--nh);--in:var(--nh)}
 *{box-sizing:border-box;margin:0}html{scroll-behavior:smooth}
 body{font:16px/1.65 var(--in);background:var(--main) var(--bgimg) center/cover fixed;color:var(--text);transition:background-color .5s}
 a{color:inherit;text-decoration:none}button{font:inherit;cursor:pointer}:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
 .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
-#splash{position:fixed;inset:0;z-index:99;display:grid;place-items:center;padding:24px;overflow:hidden;background:var(--main);text-align:center;transition:opacity .8s,visibility .8s,transform .8s}#splash.out{opacity:0;visibility:hidden;transform:scale(1.06)}
-#splash:before,#splash:after{content:"";position:absolute;left:50%;top:38%;border:1px solid var(--hi);border-radius:50%;transform:translate(-50%,-50%);opacity:0;animation:ring 3.2s ease-out infinite}#splash:after{animation-delay:1.1s}
-#splash .in{position:relative;z-index:1;max-width:1100px}
-#splash img{height:clamp(130px,26vmin,240px);width:auto;max-width:80vw;object-fit:contain;animation:pop 1s cubic-bezier(.2,1.4,.4,1) both,float 4s 1s ease-in-out infinite}
-#splash h1{font:900 clamp(28px,7vw,68px)/1.05 var(--pf);letter-spacing:.06em;margin:clamp(18px,4vh,34px) 0 0;text-transform:uppercase;animation:up .9s .45s both}#splash h1 em{font-style:normal;color:var(--hi)}
-#splash .rule{width:0;height:3px;background:var(--hi);margin:clamp(14px,3vh,26px) auto;animation:grow 1s .9s forwards}
-#splash p{font:italic 400 clamp(16px,3.2vw,28px)/1.5 var(--mw);color:var(--text);opacity:.88;max-width:640px;margin:0 auto;animation:up .9s 1.2s both}
 .bar{width:min(260px,60vw);height:4px;background:var(--line);margin:clamp(24px,5vh,44px) auto 0;overflow:hidden;border-radius:4px}.bar i{display:block;height:100%;background:var(--hi);animation:load 1.8s ease-in-out infinite alternate}
-#splash{cursor:pointer}#splash .tap{display:none;margin:clamp(24px,5vh,44px) auto 0;font:700 clamp(12px,2.6vw,15px) var(--pf);letter-spacing:.22em;text-transform:uppercase;color:var(--hi);animation:blink 1.6s ease-in-out infinite}#splash.ready .bar{display:none}#splash.ready .tap{display:block}@keyframes blink{50%{opacity:.35}}
 @keyframes pop{from{transform:scale(.4) rotate(-8deg);opacity:0}to{transform:none;opacity:1}}@keyframes load{from{width:0}to{width:100%}}
 @keyframes up{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}@keyframes grow{to{width:min(180px,40vw)}}
 @keyframes float{50%{transform:translateY(-8px)}}@keyframes ring{0%{width:120px;height:120px;opacity:.7}100%{width:130vmax;height:130vmax;opacity:0}}
@@ -89,24 +81,43 @@ footer .brand span{color:var(--text);font-size:20px}footer h4{font:700 12px var(
 a.mn{color:var(--hi);font-weight:600;background:color-mix(in srgb,var(--hi) 16%,transparent);border-bottom:2px solid var(--hi);padding:0 3px;border-radius:3px;transition:.2s}a.mn:hover{background:var(--hi);color:#111}
 .tc.hl .tp{animation:hlp 1.4s 3}.tc.hl b{color:var(--hi)}@keyframes hlp{50%{box-shadow:0 0 0 9px color-mix(in srgb,var(--hi) 45%,transparent)}}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition:none!important}}
+
+#splash{position:fixed;inset:0;z-index:99;display:grid;place-items:center;padding:24px;background:var(--main);text-align:center;cursor:pointer;transition:transform 1.1s cubic-bezier(.76,0,.24,1),visibility 0s 1.1s}#splash.out{transform:translateY(-100%);visibility:hidden}
+#splash img{height:clamp(120px,24vmin,220px);width:auto;max-width:78vw;object-fit:contain;opacity:0;transition:opacity 1.6s ease}
+#splash h1{font:900 clamp(26px,6vw,60px)/1.05 var(--pf);letter-spacing:.06em;margin-top:clamp(18px,4vh,32px);text-transform:uppercase;opacity:0;transition:opacity 1.4s ease 1.4s}#splash h1 em{font-style:normal;color:var(--hi)}
+#splash p{font:300 clamp(13px,2.8vw,20px)/1.5 var(--pf);letter-spacing:.22em;text-transform:uppercase;margin-top:14px;opacity:0;transition:opacity 1.4s ease 2.8s}#splash.lg img,#splash.lg h1,#splash.lg p{opacity:1}#splash .rule{display:none}
+#splash .tap{display:none;margin-top:clamp(24px,5vh,40px);font:700 12px var(--mo);letter-spacing:.22em;text-transform:uppercase;color:var(--hi)}#splash.ready .bar{display:none}#splash.ready .tap{display:block;opacity:0;animation:tin 1s 3.6s forwards}@keyframes tin{to{opacity:1}}
+/* minimalist */
+header{border-bottom:1px solid var(--line)}footer,.sub{border-top:1px solid var(--line)}.sub{background:none;border:1px solid var(--line)}#tick{display:none}main{padding:24px 0 40px}
+h2.sec{color:var(--text);font-weight:700;margin:56px 0 22px}.grid{gap:44px 28px}.card p{display:none}.card h3{font-size:18px}.hero p{display:block}.side .card p{display:none}
+.top{padding:18px 0 12px}.navbar{border-top:1px solid var(--line)}
+.crumb{font:700 11px var(--mo);letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}.crumb a:hover,.au:hover{color:var(--hi)}.byl{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:16px;font:500 14px var(--mo);color:var(--mute)}.byl .au{color:var(--text);font-weight:700}
+.sech{margin-bottom:34px}.sech h1{font:900 clamp(32px,6vw,56px)/1.1 var(--pf);margin:6px 0 16px}.sech p{color:var(--mute)}.more{color:var(--hi);font:700 12px var(--mo);letter-spacing:.08em;text-transform:uppercase}
+.pills{display:flex;flex-wrap:wrap;gap:8px}.pills a{border:1px solid var(--line);border-radius:999px;padding:6px 16px;font:600 12px var(--mo)}.pills a:hover,.pills a.on{border-color:var(--hi);color:var(--hi)}
+.abox{display:flex;gap:20px;align-items:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:22px 0;margin-top:40px}.abox i{flex:none;width:96px;height:96px;background:center 25%/cover}.abox b{display:block;font:800 20px var(--pf);margin:4px 0}.abox p{color:var(--mute);font-size:14px;margin-bottom:8px}
+.rl{display:flex;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line);font:700 17px/1.35 var(--mw)}.rl:hover{color:var(--hi)}.rl i{flex:none;width:96px;height:64px;background:center/cover}
+@media(min-width:1281px){.top{justify-content:center;position:relative}.srch{position:absolute;right:0}nav{margin:0;justify-content:center;gap:6px}nav a{padding:12px 12px}.dd{position:relative}.dm{display:none;position:absolute;top:100%;left:0;min-width:200px;background:var(--main);border:1px solid var(--line);padding:6px 0;z-index:30}.dd:hover .dm,.dd:focus-within .dm{display:block}.dm a{display:block;padding:9px 16px;border:0;font-weight:500;letter-spacing:.04em}.dm a:hover{background:var(--slate)}}
+@media(max-width:1280px){.navbar{border:0}.dm{padding-left:14px}.dm a{font-weight:500;padding:6px 8px}.top{padding:10px 0}}
 </style></head><body>
 <div id="splash" role="button" tabindex="0" aria-label="Tap anywhere to continue"><div class="in"><img id="sLogo" alt="The Mindanao Tech logo"><h1>THE <em>MINDANAO</em> TECH</h1><div class="rule"></div><p id="sMotto"></p><div class="bar"><i></i></div><div class="tap" id="sTap">Tap anywhere to continue</div></div></div>
-<header><div class="wrap"><div class="top">
+<header><div class="wrap"><div class="top"><button id="burger" aria-label="Menu" aria-expanded="false">&#9776;</button>
 <a class="brand" href="#home" aria-label="The Mindanao Tech home"><span id="hLogo"></span><span>THE <em>MINDANAO</em> TECH</span></a>
-<button id="burger" aria-label="Menu" aria-expanded="false">&#9776;</button>
-<nav id="nav"></nav>
-<form class="srch" id="sf" role="search"><input type="search" placeholder="Search stories" aria-label="Search"><button aria-label="Search">&#9906;</button></form></div></div></header>
+<form class="srch" id="sf" role="search"><input type="search" placeholder="Search stories" aria-label="Search"><button aria-label="Search">&#9906;</button></form></div></div>
+<div class="navbar"><div class="wrap"><nav id="nav"></nav></div></div></header>
 <div id="tick"><div class="wrap"><b>LATEST</b><span id="tk"></span></div></div>
 <main class="wrap" id="view"></main>
 <footer><div class="wrap"><div><a class="brand" href="#home"><span id="fLogo"></span><span>THE MINDANAO TECH</span></a><p style="margin-top:12px;max-width:380px" id="fAbout"></p></div>
-<div><h4>Sections</h4><div id="fCats"></div></div><div><h4>Follow</h4><a id="fb" target="_blank" rel="noopener">Facebook</a><a href="#home">Subscribe</a><a href="privacy.html">Privacy Policy</a></div>
+<div><h4>Sections</h4><div id="fCats"></div></div><div><h4>Follow</h4><a id="fb" target="_blank" rel="noopener">Facebook</a><a id="ig" target="_blank" rel="noopener">Instagram</a><a id="tt" target="_blank" rel="noopener">TikTok</a><a href="#home">Subscribe</a><a href="privacy.html">Privacy Policy</a></div>
 <div class="cp"><span id="fName"></span><span id="fDev"></span></div></div></footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="config.js"></script><script src="theme.js"></script>
 <script>
 const $=s=>document.querySelector(s),root=document.documentElement;
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const DEF={name:"The Mindanao Tech",motto:"Informing the campus, one story at a time.",logo:"",facebook:"https://www.facebook.com/",splash:"always",perPage:6,footer:"",categories:"News,Explainers,Opinion,Life,Sorted,Multimedia"};
+const DEF={name:"The Mindanao Tech",motto:"Informing the campus, one story at a time.",logo:"",facebook:"https://www.facebook.com/",splash:"always",perPage:6,footer:"",categories:"Breaking News,Local,National,Special Reports,Editorial,Column,Commentary,Essay,Sports,DYK,PsychTalks,Profiles,Culture,Lifestyle,Community",instagram:"https://www.instagram.com/",tiktok:"https://www.tiktok.com/"};
+const SECS=[{n:"Home"},{n:"News",s:["Breaking News","Local","National","Special Reports"]},{n:"Opinion",s:["Editorial","Column","Commentary","Essay"]},{n:"Sports"},{n:"Sciences",s:["DYK","PsychTalks"]},{n:"Features",s:["Profiles","Culture","Lifestyle","Community"]},{n:"About Us"}],
+ALLC=SECS.flatMap(x=>x.n=="Home"||x.n=="About Us"?[]:[x.n,...(x.s||[])]),par=c=>(SECS.find(x=>x.n==c||(x.s||[]).includes(c))||{n:c}).n,
+nm=a=>{const l=String(a||"").split(/[\p{Extended_Pictographic}\uFE0F\u200D]+\s*:?\s*/u).map(x=>x.trim()).filter(Boolean);return l.length?l:["Staff"]};
 const ok=CFG.SUPABASE_URL&&!CFG.SUPABASE_URL.includes("YOUR");
 const QS=new URLSearchParams(location.search),OAUTH=QS.has("code"),OERR=QS.get("error_description")||"";
 const db=ok?supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_KEY,{auth:{flowType:"pkce",detectSessionInUrl:true,persistSession:true}}):null;
@@ -117,10 +128,10 @@ const PH=/\n*\[\[photos\]\]([\s\S]*?)\[\[\/photos\]\]\s*$/,
 const mins=a=>Math.max(1,Math.round(txt(a).split(/\s+/).length/200));
 const fmt=d=>new Date(d).toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"});
 const bg=a=>a.image?`background-image:url('${esc(a.image)}')`:`background-image:linear-gradient(135deg,var(--slate),var(--main))`;
-const meta=a=>`<div class="meta"><span>By ${esc(a.author||"Staff")}</span><span>${fmt(a.created_at)}</span><span>${mins(a)} min read</span></div>`;
-const card=a=>`<a class="card" href="#p-${a.id}"><div class="thumb"><i style="${bg(a)}"></i></div><span class="tag" style="display:block;margin-top:12px">${esc(a.category)}</span><h3>${esc(a.title)}</h3><p>${esc(a.excerpt)}</p>${meta(a)}</a>`;
+const meta=a=>`<div class="meta"><span>By ${esc(nm(a.author).join(", "))}</span><span>${fmt(a.created_at)}</span><span>${mins(a)} min read</span></div>`;
+const card=a=>`<a class="card" href="#p-${a.id}">${a.category=="Breaking News"?"":`<div class="thumb"><i style="${bg(a)}"></i></div>`}<span class="tag" style="display:block;margin-top:12px">${esc(a.category)}</span><h3>${esc(a.title)}</h3><p>${esc(a.excerpt)}</p>${meta(a)}</a>`;
 const logoImg=()=>`<img class="logo" src="${esc(LOGO)}" alt="The Mindanao Tech logo" onerror="this.outerHTML='<span class=mono>MT</span>'">`;
-const byCat=c=>POSTS.filter(a=>(a.category||"").toLowerCase()===c);
+const byCat=c=>{const x=SECS.find(v=>v.n.toLowerCase()==c),k=(x?[x.n,...(x.s||[])]:[c]).map(v=>v.toLowerCase());return POSTS.filter(a=>k.includes((a.category||"").toLowerCase()))};
 const block=(t,c,n,fn)=>{const l=byCat(c).slice(0,n);return l.length?`<h2 class="sec"><span>${t}</span><a href="#${c}">View all &rarr;</a></h2>${fn(l)}`:""};
 const TEAM=()=>(Array.isArray(S.team)?S.team:[]).map(g=>({...g,members:(g.members||[]).filter(m=>m&&m.name)})).filter(g=>g.members.length);
 const mCard=m=>`<div class="tc" id="tm-${esc(m.id||"")}"><div class="tp">${esc((m.name||"?").trim().charAt(0).toUpperCase())}${m.photo?`<i style="background-image:url('${esc(m.photo)}')"></i>`:""}</div><b>${esc(m.name)}</b>${m.role?`<span>${esc(m.role)}</span>`:""}</div>`;
@@ -136,22 +147,30 @@ const subscribe=`<section class="sub"><div><h2>Get new stories in your inbox</h2
 function render(){
   const h=decodeURIComponent(location.hash.slice(1))||"home",v=$("#view");
   const art=h.startsWith("p-")&&POSTS.find(a=>a.id===h.slice(2)),cat=CATS.find(c=>c.toLowerCase()===h.toLowerCase()),s=(page-1)*S.perPage;let html="";
-  document.querySelectorAll("#nav>a").forEach(a=>a.classList.toggle("on",a.dataset.k===(art?art.category:cat||(h=="home"?"home":h.startsWith("team")?"team":""))));
+  document.querySelectorAll("#nav a[data-k]").forEach(a=>a.classList.toggle("on",a.dataset.k===(art?par(art.category):cat?par(cat):h=="home"?"Home":h.startsWith("team")?"About Us":"")));
+
   if(art){LK=nameLinker();const u=encodeURIComponent(location.href.split("#")[0]+"#p-"+art.id),t=encodeURIComponent(art.title),au=art.author||"Staff";
-    html=`<article class="art"><a class="back" href="#${esc(art.category.toLowerCase())}">&larr; ${esc(art.category)}</a><br><span class="tag" style="display:block;margin-top:14px">${esc(art.category)}</span><h1>${esc(art.title)}</h1><p style="color:var(--mute);font-size:18px">${esc(art.excerpt)}</p>
-    <div class="by" style="margin-top:16px"><span class="av">${esc(au.trim().charAt(0).toUpperCase())}</span><div><b>${esc(au)}</b>${meta(art).replace(/<span>By [^<]*<\/span>/,"")}</div></div>
+    const names=nm(art.author),by=names.map(n=>`<a class="au" href="#a-${encodeURIComponent(n)}">${esc(n)}</a>`).join(", "),P=par(art.category),
+      mem=TEAM().flatMap(g=>g.members).find(m=>m.name.trim().toLowerCase()==names[0].toLowerCase()),rel=POSTS.filter(a=>a!==art&&par(a.category)==P).slice(0,3);
+    html=`<article class="art"><nav class="crumb"><a href="#home">Home</a> / <a href="#${esc(P.toLowerCase())}">${esc(P)}</a>${P!=art.category?` / <a href="#${esc(art.category.toLowerCase())}">${esc(art.category)}</a>`:""}</nav><h1>${esc(art.title)}</h1><p style="color:var(--mute);font-size:18px">${esc(art.excerpt)}</p>
+    <div class="byl">${by}<span>&middot;</span>${fmt(art.created_at)}<span>&middot;</span>${mins(art)} min read</div>
     <div class="share"><span>SHARE</span><a target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${u}">Facebook</a><a target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=${u}&text=${t}">X</a><button id="cp">Copy link</button></div>
-    <div class="thumb"><i style="${bg(art)}"></i></div>${pics(art).length?`<div class="gal${pics(art).length==1?" one":""}">${pics(art).map(u=>`<a href="${esc(u)}" data-lb><img src="${esc(u)}" alt="" loading="lazy"></a>`).join("")}</div>`:""}<div class="body">${txt(art).split(/\n\s*\n/).map(p=>`<p>${LK(esc(p))}</p>`).join("")}</div><section class="eng" id="eng" aria-label="Likes and comments"></section></article>`;document.title=art.title+" | The Mindanao Tech"}
+    ${art.category=="Breaking News"?"":`<div class="thumb"><i style="${bg(art)}"></i></div>`}${pics(art).length?`<div class="gal${pics(art).length==1?" one":""}">${pics(art).map(u=>`<a href="${esc(u)}" data-lb><img src="${esc(u)}" alt="" loading="lazy"></a>`).join("")}</div>`:""}<div class="body">${txt(art).split(/\n\s*\n/).map(p=>`<p>${LK(esc(p))}</p>`).join("")}</div>
+    <section class="abox">${mem&&mem.photo?`<i style="background-image:url('${esc(mem.photo)}')"></i>`:""}<div><span class="tag">Author</span><b>${by}</b>${mem&&mem.role?`<p>${esc(mem.role)}</p>`:""}<a class="more" href="#a-${encodeURIComponent(names[0])}">More from ${esc(names[0])}</a></div></section>
+    <section class="eng" id="eng" aria-label="Likes and comments"></section>${rel.length?`<section class="rel"><h2 class="sec"><span>Related stories</span></h2>${rel.map(a=>`<a class="rl" href="#p-${a.id}">${a.category=="Breaking News"||!a.image?"":`<i style="${bg(a)}"></i>`}<span>${esc(a.title)}</span></a>`).join("")}</section>`:""}</article>`;document.title=art.title+" | The Mindanao Tech"}
   else if(h==="team"||h.startsWith("team-")){const T=TEAM();
     html=`<h2 class="sec" style="margin-top:0"><span>Our Team</span></h2><p class="tm-in">The people behind ${esc(S.name||"The Mindanao Tech")}.</p>`+(T.length?T.map(g=>`<h2 class="sec"><span>${esc(g.title)}</span></h2><div class="tg">${g.members.map(mCard).join("")}</div>`).join(""):"<p style='margin-top:20px'>Our team will be introduced here soon.</p>");document.title="Our Team | The Mindanao Tech"}
+  else if(h.startsWith("a-")){const n=h.slice(2),l=POSTS.filter(a=>nm(a.author).some(x=>x.toLowerCase()==n.toLowerCase())),mem=TEAM().flatMap(g=>g.members).find(m=>m.name.trim().toLowerCase()==n.toLowerCase());
+    html=`<header class="sech"><span class="tag">Author</span><h1>${esc(n)}</h1>${mem&&mem.role?`<p>${esc(mem.role)}</p>`:""}<p><a class="more" href="#team">Our Team</a></p></header>`+(l.length?`<div class="grid">${l.map(card).join("")}</div>`:"<p>No stories yet.</p>");document.title=n+" | The Mindanao Tech"}
   else if(h.startsWith("q-")){const q=h.slice(2).toLowerCase(),l=POSTS.filter(a=>[a.title,a.excerpt,a.author,a.category,txt(a)].join(" ").toLowerCase().includes(q));
     html=`<h2 class="sec" style="margin-top:0"><span>Search: ${esc(q)} (${l.length})</span></h2>`+(l.length?`<div class="grid">${l.map(card).join("")}</div>`:"<p>No stories matched your search.</p>")}
-  else if(cat){const l=byCat(cat.toLowerCase());html=`<h2 class="sec" style="margin-top:0"><span>${esc(cat)}</span></h2>`+(l.length?`<div class="grid">${l.slice(s,s+S.perPage).map(card).join("")}</div>${pager(l.length)}`:"<p>No stories here yet. Check back soon.</p>");document.title=cat+" | The Mindanao Tech"}
+  else if(cat){const l=byCat(cat.toLowerCase()),P=SECS.find(x=>x.n==par(cat)),pl=P&&P.s?`<div class="pills"><a href="#${esc(P.n.toLowerCase())}" class="${P.n==cat?"on":""}">All</a>${P.s.map(t=>`<a href="#${esc(t.toLowerCase())}" class="${t==cat?"on":""}">${esc(t)}</a>`).join("")}</div>`:"";
+    html=`<header class="sech"><span class="tag">${P&&P.n!=cat?esc(P.n):"Section"}</span><h1>${esc(cat)}</h1>${pl}</header>`+(l.length?`<div class="grid">${l.slice(s,s+S.perPage).map(card).join("")}</div>${pager(l.length)}`:"<p>No stories here yet. Check back soon.</p>");document.title=cat+" | The Mindanao Tech"}
   else if(!POSTS.length){html=`<p>No stories published yet.${ok?"":" Add your Supabase details in config.js to load stories."}</p>`+subscribe}
   else{const f=POSTS.filter(a=>a.featured).slice(0,3),m=f[0]||POSTS[0],side=(f.length>1?f.slice(1):POSTS.filter(a=>a!==m).slice(0,2)),shown=[m,...side],rest=POSTS.filter(a=>!shown.includes(a));
     html=`<section class="feat"><a class="hero" href="#p-${m.id}"><div class="thumb"><i style="${bg(m)}"></i></div><span class="tag" style="display:block;margin-top:16px">${esc(m.category)}</span><h1>${esc(m.title)}</h1><p>${esc(m.excerpt)}</p>${meta(m)}</a><div class="side">${side.map(card).join("")}</div></section>
     <h2 class="sec"><span>Latest stories</span></h2><div class="grid">${rest.slice(s,s+S.perPage).map(card).join("")}</div>${pager(rest.length)}`;
-    if(page==1)html+=block("Opinion &amp; Editorial","opinion",3,l=>`<div class="grid">${l.map(card).join("")}</div>`)+block("Student Life &amp; Campus","life",3,l=>`<div class="grid">${l.map(card).join("")}</div>`)+block("Technology, Science &amp; Innovation","explainers",3,l=>`<div class="grid">${l.map(card).join("")}</div>`)+block("Photojournalism","multimedia",8,l=>`<div class="gal">${l.map(a=>`<a class="card" href="#p-${a.id}" title="${esc(a.title)}"><div class="thumb"><i style="${bg(a)}"></i></div></a>`).join("")}</div>`);
+    if(page==1)html+=SECS.filter(x=>x.n!="Home"&&x.n!="About Us").map(x=>block(x.n,x.n.toLowerCase(),3,l=>`<div class="grid">${l.map(card).join("")}</div>`)).join("");
     html+=subscribe;document.title="The Mindanao Tech";}
   v.style.animation="none";v.offsetHeight;v.style.animation="";v.innerHTML=html;if(art&&db)engage(art);else ENG.id=null;
   if(h.startsWith("team-"))setTimeout(()=>{const el=document.getElementById("tm-"+h.slice(5));if(el){el.scrollIntoView({behavior:"smooth",block:"center"});el.classList.add("hl")}},300);
@@ -161,14 +180,16 @@ function render(){
     $("#ok").textContent=err?"Something went wrong. Please try again.":"Thanks! You're on the list.";if(!err)f.reset()};
 }
 function applySettings(){
-  LOGO=S.logo||"logo.png";CATS=String(S.categories).split(",").map(c=>c.trim()).filter(Boolean);S.perPage=+S.perPage||6;
+  LOGO=S.logo||"logo.png";CATS=ALLC;S.perPage=+S.perPage||6;
   const pv=new URLSearchParams(location.search).get("preview");MT.apply(MT.resolve(S,pv||undefined),LOGO);
-  $("#ico").href=LOGO;$("#sLogo").src=LOGO;$("#sLogo").onerror=e=>e.target.remove();$("#sMotto").textContent=S.motto||DEF.motto;
-  $("#hLogo").innerHTML=$("#fLogo").innerHTML=logoImg();$("#fb").href=S.facebook;$("#fAbout").textContent=S.motto+" The official student publication of the University of Southern Mindanao.";
-  $("#fName").textContent=S.footer||"© "+new Date().getFullYear()+" The Mindanao Tech. All rights reserved.";
+  $("#ico").href=LOGO;$("#sLogo").src=LOGO;$("#sLogo").onerror=e=>e.target.remove();$("#sMotto").textContent="Vanguard of Student’s Right";
+  $("#hLogo").innerHTML=$("#fLogo").innerHTML=logoImg();$("#fb").href=S.facebook;$("#ig").href=S.instagram||DEF.instagram;$("#tt").href=S.tiktok||DEF.tiktok;$("#fAbout").textContent=S.motto+" The official student publication of the University of Southern Mindanao.";
+  $("#fName").textContent=S.footer||"Copyright © "+new Date().getFullYear()+" - The Mindanao Tech | All Rights Reserved";
   const q=$("#sf").outerHTML.replace('id="sf"','');
-  $("#nav").innerHTML=`<a href="#home" data-k="home">Home</a>`+CATS.map(c=>`<a href="#${esc(c.toLowerCase())}" data-k="${esc(c)}">${esc(c)}</a>`).join("")+(TEAM().length?`<a href="#team" data-k="team">Our Team</a>`:"")+q;
-  $("#fCats").innerHTML=CATS.map(c=>`<a href="#${esc(c.toLowerCase())}">${esc(c)}</a>`).join("")+(TEAM().length?`<a href="#team">Our Team</a>`:"");
+  $("#nav").innerHTML=SECS.map(x=>{const h=x.n=="About Us"?"team":x.n.toLowerCase(),a=`<a href="#${esc(h)}" data-k="${esc(x.n)}">${esc(x.n)}</a>`;return x.s?`<div class="dd">${a}<div class="dm">${x.s.map(t=>`<a href="#${esc(t.toLowerCase())}">${esc(t)}</a>`).join("")}</div></div>`:a}).join("")+q;
+
+  $("#fCats").innerHTML=SECS.slice(1).map(x=>`<a href="#${x.n=="About Us"?"team":esc(x.n.toLowerCase())}">${esc(x.n)}</a>`).join("");
+
   const dv=TEAM().find(g=>g.id==="dev");$("#fDev").innerHTML=dv?` &middot; Developed by <a href="#team" style="display:inline">${dv.members.map(m=>esc(m.name)).join(", ")}</a>`:"";
   $("#tk").innerHTML=POSTS.slice(0,6).map(a=>`<a href="#p-${a.id}">${esc(a.title)}</a>`).join(" &bull; ");
   document.querySelectorAll("form.srch").forEach(f=>f.onsubmit=e=>{e.preventDefault();const t=f.querySelector("input").value.trim();if(t){location.hash="q-"+encodeURIComponent(t);$("#nav").classList.remove("open")}});
@@ -257,8 +278,8 @@ addEventListener("hashchange",()=>{page=1;$("#nav").classList.remove("open");ren
   const sp=$("#splash");let seen=false;try{seen=S.splash=="once"&&sessionStorage.getItem("mt-seen")=="1";sessionStorage.setItem("mt-seen","1")}catch(e){}
   if(S.splash=="off"||seen){sp.remove();return}
   const im=$("#sLogo");let ready=false;
-  const ok=()=>{if(ready)return;ready=true;sp.classList.add("ready")};
-  const go=()=>{if(!ready||sp.classList.contains("out"))return;sp.classList.add("out");setTimeout(()=>sp.remove(),900)};
+  const ok=()=>{if(ready)return;ready=true;sp.classList.add("ready","lg")};
+  const go=()=>{if(!ready||sp.classList.contains("out"))return;sp.classList.add("out");setTimeout(()=>sp.remove(),1200)};
   if(!im.isConnected||im.complete)ok();else{im.addEventListener("load",ok);im.addEventListener("error",ok)}
   setTimeout(ok,20000);
   sp.addEventListener("click",go);sp.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}});
