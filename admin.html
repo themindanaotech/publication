@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex"><title>Admin | The Mindanao Tech</title><link rel="icon" href="logo.png"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@500;600;700;800&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+<meta name="robots" content="noindex"><title>Admin | The Mindanao Tech</title><link rel="icon" href="logo.png">
 <style>
+@font-face{font-family:'Neue Haas Display';src:local('Neue Haas Display Light'),url(fonts/NeueHaasDisplayLight.ttf) format('truetype');font-weight:300;font-display:swap}@font-face{font-family:'Neue Haas Display';src:local('Neue Haas Display Roman'),url(fonts/NeueHaasDisplayRoman.ttf) format('truetype');font-weight:400;font-display:swap}@font-face{font-family:'Neue Haas Display';src:local('Neue Haas Display Medium'),url(fonts/NeueHaasDisplayMediu.ttf) format('truetype');font-weight:500;font-display:swap}@font-face{font-family:'Neue Haas Display';src:local('Neue Haas Display Bold'),url(fonts/NeueHaasDisplayBold.ttf) format('truetype');font-weight:700;font-display:swap}@font-face{font-family:'Neue Haas Display';src:local('Neue Haas Display Black'),url(fonts/NeueHaasDisplayBlack.ttf) format('truetype');font-weight:900;font-display:swap}
 /* Same design tokens as index.html, so the admin always matches the live site theme (theme.js sets them). */
-:root{--main:#080e19;--slate:#172235;--hi:#f4b344;--text:#f5f1e8;--acc:#f4b344;--mute:#a9b0be;--line:#ffffff24;--bad:#ff8a8a;--bgimg:none;--pf:'Playfair Display',Georgia,serif;--mo:'Montserrat',system-ui,sans-serif;--in:'Inter',system-ui,sans-serif;color-scheme:dark}
+:root{--main:#080e19;--slate:#172235;--hi:#f4b344;--text:#f5f1e8;--acc:#f4b344;--mute:#a9b0be;--line:#ffffff24;--bad:#ff8a8a;--bgimg:none;--nh:'Neue Haas Display','Neue Haas Grotesk Display Pro','Helvetica Neue',Helvetica,Arial,sans-serif;--pf:var(--nh);--mw:var(--nh);--mo:var(--nh);--in:var(--nh)}
 *{box-sizing:border-box;margin:0}html{scroll-behavior:smooth}
 body{font:15px/1.5 var(--in);background:var(--main) var(--bgimg) center/cover fixed;color:var(--text);transition:background-color .5s}
 :focus-visible{outline:3px solid var(--hi);outline-offset:2px}
@@ -98,6 +99,8 @@ img.pv{max-height:90px;border-radius:2px;margin-top:8px;display:block}.hint{colo
 <label>Motto</label><input type="text" name="motto">
 <label>Logo</label><input type="file" id="limg" accept="image/*"><input type="hidden" name="logo"><img class="pv hide" id="lpv" alt="">
 <label>Facebook page link</label><input type="text" name="facebook">
+<label>Instagram page link</label><input type="text" name="instagram">
+<label>TikTok page link</label><input type="text" name="tiktok">
 <label>Categories <small>comma separated, in menu order</small></label><input type="text" name="categories">
 <div class="row"><div><label>Main color</label><input type="color" name="accent"></div><div><label>Highlight color</label><input type="color" name="highlight"></div></div>
 <div class="row"><div><label>Default theme</label><select name="theme"><option value="light">Light</option><option value="dark">Dark</option></select></div>
@@ -143,7 +146,7 @@ img.pv{max-height:90px;border-radius:2px;margin-top:8px;display:block}.hint{colo
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const db=supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_KEY);
-const DEFS={name:"Mindanao Tech",initials:"MT",motto:"",logo:"",facebook:"",accent:"#1d4ed8",highlight:"#f5b301",theme:"light",splash:"always",perPage:6,footer:"",categories:"News,Explainers,Opinion,Life,Sorted,Multimedia"};
+const DEFS={name:"Mindanao Tech",initials:"MT",motto:"",logo:"",facebook:"",instagram:"",tiktok:"",accent:"#1d4ed8",highlight:"#f5b301",theme:"light",splash:"always",perPage:6,footer:"",categories:"Breaking News,Local,National,Special Reports,Editorial,Column,Commentary,Essay,Sports,DYK,PsychTalks,Profiles,Culture,Lifestyle,Community"};
 let POSTS=[],S={...DEFS},editing=null,ME=null;
 // Names are turned into a private sign-in id (no real email is used or sent). Must match admin_create() in supabase-setup.sql.
 const DOM="mindanaotech.app",slug=n=>String(n).trim().toLowerCase().replace(/[^a-z0-9]+/g,".").replace(/^\.+|\.+$/g,""),toEmail=n=>n.includes("@")?n.trim():slug(n)+"@"+DOM;
