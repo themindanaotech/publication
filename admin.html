@@ -128,7 +128,7 @@ body.editing .wrap{max-width:1500px}
 </form></section>
 
 <section id="t-menu" class="hide"><div class="box"><h3>Menu &amp; categories</h3><span class="hint" style="display:block;margin:4px 0 14px">Home and About Us are always first and last. Add sections and subsections here: each one appears in the site menu and in the post form's Category list. Sections with no subsections hold posts themselves.</span>
-<form id="mf" style="display:flex;gap:8px"><input type="text" id="mname" placeholder="New section, e.g. Multimedia" required maxlength="30" autocomplete="off"><button class="p">Add section</button></form></div><div id="mlist"></div></section>
+<form id="mnf" style="display:flex;gap:8px"><input type="text" id="mname" placeholder="New section, e.g. Multimedia" required maxlength="30" autocomplete="off"><button class="p">Add section</button></form></div><div id="mlist"></div></section>
 <section id="t-cats" class="hide">
 <div id="cList"><div class="box"><h3>Categories</h3><span class="hint" style="display:block;margin:4px 0 14px">Each category appears in the site menu, in this order. Open a category to see its stories and upload a new post straight into it.</span>
 <form id="cf" style="display:flex;gap:8px"><input type="text" id="cname" placeholder="New category name, e.g. Sports" required maxlength="30" autocomplete="off"><button class="p">Add category</button></form>
@@ -224,7 +224,7 @@ document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.que
 
 async function load(){
   const f=$("#sf");for(const k in S)if(f.elements[k])f.elements[k].value=S[k];pv($("#lpv"),S.logo);
-  fillCats();loadPosts();loadSubs();loadComments();drawTeam();drawThemes();loadAdmins();
+  for(const fn of [fillCats,loadPosts,loadSubs,loadComments,drawTeam,drawThemes,loadAdmins])try{fn()}catch(e){console.error(e)}
 }
 async function loadPosts(){
   const {data}=await db.from("posts").select("*").order("created_at",{ascending:false});POSTS=data||[];
@@ -319,7 +319,7 @@ $("#mlist").onclick=async e=>{const t=e.target.closest("button[data-m]");if(!t)r
   if(a=="addsub"){const n=ask("New subsection under "+X.n+":");if(!n)return;(X.s=X.s||[]).push(n);return saveMenu(M,"Subsection added")}
   if(a=="ren"){const old=j<0?X.n:X.s[j],n=ask("Rename:",old);if(!n)return;const r=await db.from("posts").update({category:n}).eq("category",old);if(r.error)return say(r.error.message);j<0?X.n=n:X.s[j]=n;if(await saveMenu(M,"Renamed"))loadPosts();return}
   if(a=="del"){const c=j<0?X.n:X.s[j];if(!confirm('Delete "'+c+'" from the menu?'+(j<0&&X.s&&X.s.length?" Its subsections go too.":"")+" Posts in it are kept but will no longer appear on a menu page."))return;j<0?M.splice(i,1):X.s.splice(j,1);return saveMenu(M,"Deleted")}};
-$("#mf").onsubmit=async e=>{e.preventDefault();const M=JSON.parse(JSON.stringify(getMenu())),n=$("#mname").value.trim().replace(/,/g," ");if(!n)return;if(allN(M).some(c=>c.toLowerCase()==n.toLowerCase()))return say("That name is already used.");M.push({n,s:[]});if(await saveMenu(M,"Section added"))$("#mf").reset()};
+$("#mnf").onsubmit=async e=>{e.preventDefault();const M=JSON.parse(JSON.stringify(getMenu())),n=$("#mname").value.trim().replace(/,/g," ");if(!n)return;if(allN(M).some(c=>c.toLowerCase()==n.toLowerCase()))return say("That name is already used.");M.push({n,s:[]});if(await saveMenu(M,"Section added"))$("#mf").reset()};
 /* ---- Categories ---- */
 const getCats=()=>String(S.categories||"").split(",").map(c=>c.trim()).filter(Boolean);
 function fillCats(){const f=$("#pf").elements.category,v=f.value;f.innerHTML=getCats().map(c=>`<option>${esc(c)}</option>`).join("");if(v&&getCats().includes(v))f.value=v;
